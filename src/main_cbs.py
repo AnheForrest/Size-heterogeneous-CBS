@@ -16,7 +16,7 @@ from priority import sort_tasks_by_priority
 from congestion_coefficient import compute_cr
 from reservation_table import ReservationTable
 from astar import astar
-from cbs import CBS                     # 新增导入
+from cbs import CBS
 from visualization import draw_map, draw_agents, draw_path, animate_solution
 
 
@@ -194,15 +194,20 @@ def main():
         # 创建一个仅包含桥信息的空预约表（供 CBS 内部使用）
         empty_reservation = ReservationTable(bridge_cells=all_bridges)
 
-        # ==================== 7. 调用 CBS 求解 ====================
-        print("\n[7] 启动 CBS 搜索...")
+        # 创建 CBS 对象
         cbs = CBS(
             agents=tasks,
             passable_graphs=passable_graphs,
             reservation_table=empty_reservation,   # 空预约表（仅含桥信息）
             cr=cr
         )
-        solution = cbs.search()
+
+        # 询问是否进入交互调试模式
+        interactive_mode = input("\n是否进入交互调试模式？(y/n, 默认 n): ").strip().lower() == 'y'
+
+        # ==================== 7. 调用 CBS 求解 ====================
+        print("\n[7] 启动 CBS 搜索...")
+        solution = cbs.search(interactive=interactive_mode)
 
         if solution is None:
             print("CBS 未找到可行解，程序退出。")

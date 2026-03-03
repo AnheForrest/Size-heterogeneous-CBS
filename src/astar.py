@@ -18,7 +18,8 @@ def astar(agent_instance: AgentInstance,
           weight_cr: float = 0.1,
           weight_bridge: float = 10.0,
           weight_res: float = 1.0,
-          constraints: List[Tuple[int, Tuple[int, int]]] = None) -> Optional[List[Tuple[int, int]]]:
+          constraints: List[Tuple[int, Tuple[int, int]]] = None,
+          wait_cost: float = 0 ) -> Optional[List[Tuple[int, int]]]:
     """
     使用 A* 算法为单个智能体规划路径，支持 CBS 硬约束（禁止在特定时刻占据特定位置）。
 
@@ -30,6 +31,7 @@ def astar(agent_instance: AgentInstance,
     :param weight_bridge: 桥栅格惩罚权重（每个桥栅格累加）
     :param weight_res: 预约表占用计数权重
     :param constraints: 硬约束列表，每个元素为 (t, pos)，表示禁止在时间 t 占据位置 pos
+    :param wait_cost: 等待动作的步时代价（默认1.0，与移动相同；设为小于1可鼓励等待）
     :return: 路径列表（每个元素为左上角坐标），若无解则返回 None
     """
     if constraints is None:
@@ -118,7 +120,7 @@ def astar(agent_instance: AgentInstance,
             penalty = step_penalty(nbr, nt)
             if penalty == float('inf'):
                 continue
-            ng = g + 1 + penalty
+            ng = g + 1 + penalty  # 移动代价固定为1
             state = (nbr, nt)
             if ng < g_score.get(state, float('inf')):
                 g_score[state] = ng
@@ -126,11 +128,11 @@ def astar(agent_instance: AgentInstance,
                 heapq.heappush(open_set, (f_val, ng, nt, nbr))
                 came_from[state] = (pos, t)
 
-        # 扩展等待动作
+        # 扩展等待动作（使用可调的等待代价）
         nt = t + 1
         penalty = step_penalty(pos, nt)
         if penalty != float('inf'):
-            ng = g + 1 + penalty
+            ng = g + wait_cost + penalty  # 等待代价为 wait_cost
             state = (pos, nt)
             if ng < g_score.get(state, float('inf')):
                 g_score[state] = ng

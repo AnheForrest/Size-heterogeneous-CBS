@@ -122,10 +122,9 @@ def assign_severity(conflict: Dict,
 
 def sort_conflicts(conflicts: List[Dict]) -> List[Dict]:
     """
-    按严重程度降序排序冲突列表
-
-    :param conflicts: 冲突列表（应包含 'severity' 键）
+    按严重程度降序排序冲突列表，严重程度相同时按时间升序（优先处理早的冲突）。
+    :param conflicts: 冲突列表（应包含 'severity' 和 'time' 键）
     :return: 排序后的列表
     """
-    conflicts.sort(key=lambda c: c.get('severity', 0), reverse=True)
+    conflicts.sort(key=lambda c: (-c.get('severity', 0), c.get('time', 0)))
     return conflicts
