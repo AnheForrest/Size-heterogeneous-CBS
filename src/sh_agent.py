@@ -6,8 +6,27 @@
 3.定义具体任务智能体
 """
 
-
 from typing import List, Tuple, Optional
+
+# 类别编号到字母的映射
+CATEGORY_LETTERS = {
+    1: 'A',
+    2: 'B',
+    3: 'C',
+    4: 'D',
+    5: 'E',
+    6: 'F',
+    7: 'G',
+    8: 'H',
+    9: 'I',
+    10: 'J',
+    11: 'K',
+    12: 'L',
+    13: 'M',
+    14: 'N',
+    15: 'O',
+    16: 'P'
+}
 
 class AgentClass:
     """
@@ -82,17 +101,21 @@ class AgentInstance:
         :param goal: 终点左上角坐标 (x, y)
         """
         self.agent_class = agent_class
-        self.id = instance_id
+        self.id = instance_id                     # 同类内数字编号
+        self.category = agent_class.category
+        self.global_id: Optional[int] = None      # 全局唯一ID（由任务生成器赋值）
+        letter = CATEGORY_LETTERS.get(self.category, '?')
+        self.id_str = f"{letter}{instance_id}"    # 例如 A0, B1
         self.start = start
         self.goal = goal
-        self.path: Optional[List[Tuple[int, int]]] = None   # 规划路径，每个元素为位置坐标
-        self.arrival_time: Optional[int] = None             # 到达目标点的时间步
+        self.path: Optional[List[Tuple[int, int]]] = None
+        self.arrival_time: Optional[int] = None
 
     def set_path(self, path: List[Tuple[int, int]]) -> None:
         """设置智能体的规划路径"""
         self.path = path
         if path:
-            self.arrival_time = len(path) - 1   # 假设路径长度即为到达时间（等待也算时间步）
+            self.arrival_time = len(path) - 1
         else:
             self.arrival_time = None
 
@@ -101,5 +124,5 @@ class AgentInstance:
         return self.path
 
     def __repr__(self) -> str:
-        return (f"AgentInstance(class={self.agent_class.category}, id={self.id}, "
+        return (f"AgentInstance({self.id_str}, class={self.agent_class.category}, "
                 f"start={self.start}, goal={self.goal})")

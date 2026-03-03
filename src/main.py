@@ -1,17 +1,17 @@
 """
 主控脚本：交互式输入参数，测试无冲突场景下的多智能体路径规划
 """
+
 import sys
 print("Script started", file=sys.stderr)
 
 import random
 import matplotlib.pyplot as plt
-import sys
 
 from gridmap import GridMap
 from sh_agent import AgentClass
 from passable_graph import PassableGraph
-from task_generator import generate_tasks, filter_feasible_tasks
+from task_generator import generate_tasks, filter_feasible_tasks, retry_failed_tasks
 from priority import sort_tasks_by_priority
 from congestion_coefficient import compute_cr
 from reservation_table import ReservationTable
@@ -124,11 +124,43 @@ def main():
             passable_graphs[cls.category] = pg
             print(f"    类别 {cls.category}: |V|={len(pg.V)}, |E|={sum(len(v) for v in pg.E.values())//2}, 桥栅格数={len(pg.bridges)}")
 
-        # ==================== 3. 生成任务 ====================
+        # ==================== 3. 生成任务（考虑起点/终点占用冲突） ====================
         print("\n[3] 生成任务...")
-        tasks = generate_tasks(agent_classes, counts, grid, passable_graphs)
-        print(f"    初始生成任务数: {len(tasks)}")
+        tasks, failed_requests = generate_tasks(
+            agent_classes,
+            counts,
+            grid,                       # 第四个参数：grid_map
+            passable_graphs,
+            existing_occupied=None,
+            max_attempts_per_agent=1000
+        )
+        print(f"    成功生成任务数: {len(tasks)}")
+        if failed_requests:
+            print(f"    有 {len(failed_requests)} 个智能体因起点/终点冲突或不可达而生成失败。")
+            # 询问是否重试
+            resp = input("是否重新生成这些失败的任务？(y/n): ").strip().lower()
+            if resp == 'y':
+                # 收集当前已成功任务的占用栅格
+                occupied = set()
+                for t in tasks:
+                    occupied.update(t.agent_class.get_occupied_cells(t.start))
+                    occupied.update(t.agent_class.get_occupied_cells(t.goal))
+                # 尝试重新生成失败的任务
+                new_tasks = retry_failed_tasks(
+                    failed_requests,
+                    agent_classes,
+                    passable_graphs,
+                    existing_occupied=occupied,   # occupied 会被更新
+                    max_attempts=10
+                )
+                tasks.extend(new_tasks)
+                print(f"    重新生成成功，新增 {len(new_tasks)} 个任务。")
+            else:
+                print("    已忽略失败的任务，继续使用已生成的任务。")
+        else:
+            print("    所有任务生成成功，无失败请求。")
 
+        # 可选：再次过滤（确保连通性，但生成时已保证）
         tasks = filter_feasible_tasks(tasks, passable_graphs)
         print(f"    过滤后剩余任务数: {len(tasks)}")
 
@@ -142,7 +174,7 @@ def main():
         for t in tasks:
             prio = t.agent_class.width + t.agent_class.height
             dist = abs(t.start[0]-t.goal[0]) + abs(t.start[1]-t.goal[1])
-            print(f"    智能体 {t.id} (类别 {t.agent_class.category}, 尺寸 {t.agent_class.width}x{t.agent_class.height}, "
+            print(f"    智能体 {t.id_str} (类别 {t.agent_class.category}, 尺寸 {t.agent_class.width}x{t.agent_class.height}, "
                   f"优先级 {prio}, 距离 {dist}) 起点 {t.start} -> 终点 {t.goal}")
 
         # ==================== 5. 计算拥堵系数 ====================
@@ -163,7 +195,7 @@ def main():
         # ==================== 7. 按顺序规划路径 ====================
         print("\n[7] 开始规划路径...")
         for task in tasks:
-            print(f"\n    规划智能体 {task.id} (类别 {task.agent_class.category})...")
+            print(f"\n    规划智能体 {task.id_str} (类别 {task.agent_class.category})...")
             path = astar(
                 agent_instance=task,
                 passable_graph=passable_graphs[task.agent_class.category],
@@ -174,12 +206,13 @@ def main():
                 weight_res=1.0
             )
             if path is None:
-                print(f"    警告：智能体 {task.id} 无法找到可行路径！")
+                print(f"    警告：智能体 {task.id_str} 无法找到可行路径！")
                 task.set_path([])
             else:
                 task.set_path(path)
                 print(f"    路径长度: {len(path)} (包含起点)")
-                reservation.add(task.id, path, task.agent_class)
+                # 预约表添加路径，使用全局唯一ID
+                reservation.add(task.global_id, path, task.agent_class)
 
         # ==================== 8. 结果输出 ====================
         print("\n" + "=" * 50)
@@ -192,9 +225,9 @@ def main():
                 cost = len(task.path) - 1
                 total_cost += cost
                 max_time = max(max_time, len(task.path)-1)
-                print(f"智能体 {task.id}: 路径 {task.path}, 到达时间 {task.arrival_time}")
+                print(f"智能体 {task.id_str}: 路径 {task.path}, 到达时间 {task.arrival_time}")
             else:
-                print(f"智能体 {task.id}: 无路径")
+                print(f"智能体 {task.id_str}: 无路径")
         print(f"总路径代价 (时间步之和): {total_cost}")
         print(f"全局完成时间: {max_time}")
 
