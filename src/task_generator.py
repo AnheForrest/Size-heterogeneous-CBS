@@ -66,6 +66,8 @@ def generate_tasks(agent_classes: List[AgentClass],
                 # 随机选择起点和终点
                 start = random.choice(pg.V)
                 goal = random.choice(pg.V)
+                while start == goal:   # 如果起点和终点相同，重新选择终点
+                    goal = random.choice(pg.V)
 
                 # 检查连通性
                 if not pg.is_connected(start, goal):
