@@ -66,10 +66,8 @@ class ReservationTable:
                 self.table[key]['count'] -= 1
                 self.table[key]['agents'].discard(agent_id)
                 if self.table[key]['count'] <= 0:
-                    # 可选：删除空条目，这里保留但标记计数为0
-                    self.table[key]['count'] = 0
-                    # 也可删除条目，但为了保留桥信息，可保留
-                    # del self.table[key]
+                    # 删除空条目
+                    del self.table[key]
 
     def query(self, x: int, y: int, t: int) -> Dict:
         """
@@ -116,24 +114,29 @@ class ReservationTable:
             occ = {}
             for t, pos in enumerate(agent.path):
                 occ[t] = self._get_occupied_cells(pos, agent.agent_class)
-            agent_occupancy[agent.id] = occ
+            agent_occupancy[agent.global_id] = occ  # 使用 global_id
 
         edge_conflicts = []
         # 遍历所有智能体对
-        for i in range(len(agents)):
-            a = agents[i]
-            if a.path is None:
+        agent_ids = list(agent_occupancy.keys())
+        for i in range(len(agent_ids)):
+            aid = agent_ids[i]
+            a = next((ag for ag in agents if ag.global_id == aid), None)
+            if a is None:
                 continue
-            occ_a = agent_occupancy[a.id]
-            max_t_a = len(a.path) - 1
-            for j in range(i+1, len(agents)):
-                b = agents[j]
-                if b.path is None:
+            occ_a = agent_occupancy[aid]
+            path_a = a.path
+            for j in range(i+1, len(agent_ids)):
+                bid = agent_ids[j]
+                b = next((ag for ag in agents if ag.global_id == bid), None)
+                if b is None:
                     continue
-                occ_b = agent_occupancy[b.id]
-                max_t_b = len(b.path) - 1
+                occ_b = agent_occupancy[bid]
+                path_b = b.path
+                if path_a is None or path_b is None:
+                    continue
                 # 遍历可能发生交换的时间步
-                max_t = min(max_t_a, max_t_b)
+                max_t = min(len(path_a), len(path_b)) - 1
                 for t in range(max_t):  # t 从 0 到 max_t-1
                     if t+1 in occ_a and t in occ_b and t+1 in occ_b:
                         cells_a_t = occ_a[t]
@@ -145,11 +148,9 @@ class ReservationTable:
                             # 记录冲突，可用 a 的 t 和 t+1 位置代表
                             edge_conflicts.append((
                                 t,
-                                a.path[t], a.path[t+1],
-                                a.id, b.id
+                                path_a[t], path_a[t+1],
+                                aid, bid
                             ))
-                            # 一旦发现冲突即可跳出内层循环，避免重复记录
-                            # 但可能存在多个 t，所以继续
         return edge_conflicts
 
     def clear(self):

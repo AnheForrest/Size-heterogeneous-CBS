@@ -160,14 +160,14 @@ def animate_solution(agents, grid_map, interval=200, save_path=None):
 
         # 起点
         start_rect = patches.Rectangle(agent.start, w, h, linewidth=1,
-                                        edgecolor=color, facecolor=color, alpha=0.3)
+                                        edgecolor=color, facecolor=color, alpha=0.1)
         ax.add_patch(start_rect)
         ax.text(agent.start[0] + w/2, agent.start[1] + h/2, 'S',
                 color='white', ha='center', va='center', fontsize=8, weight='bold')
 
         # 终点
         goal_rect = patches.Rectangle(agent.goal, w, h, linewidth=1,
-                                       edgecolor=color, facecolor=color, alpha=0.3)
+                                       edgecolor=color, facecolor=color, alpha=0.1)
         ax.add_patch(goal_rect)
         ax.text(agent.goal[0] + w/2, agent.goal[1] + h/2, 'G',
                 color='white', ha='center', va='center', fontsize=8, weight='bold')

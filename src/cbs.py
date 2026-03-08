@@ -5,6 +5,7 @@ CBS 高层模块
 """
 
 import heapq
+import time
 from copy import deepcopy
 from typing import Dict, List, Optional, Tuple
 
@@ -31,7 +32,7 @@ class CBSNode:
         # 计算 metrics
         self.makespan = 0
         self.total_cost = 0
-        self.conflict_count = 0  # 新增：当前节点的冲突数量
+        self.conflict_count = 0  # 当前节点的冲突数量
         if paths:
             # makespan = 最大路径长度-1 (总时间步)
             # total_cost = 各智能体移动步数之和 (移动指位置变化，等待不计)
@@ -43,6 +44,7 @@ class CBSNode:
                 steps = len(path) - 1
                 if steps > max_len:
                     max_len = steps
+                # 修正：移动次数统计 - 统计连续不同位置的数量
                 moves = 0
                 for i in range(1, len(path)):
                     if path[i] != path[i-1]:
@@ -89,7 +91,8 @@ class CBS:
         self.best_total_cost = float('inf')
         self.best_node = None
         self.expanded_signatures = set()   # 记录已扩展节点的签名，避免重复
-        self.conflict_counter = {}          # 记录每个冲突被选择的次数，用于打破循环
+        self.conflict_tries = {}          # 记录每个冲突的尝试组合，避免重复尝试
+        self.max_tries_per_conflict = 10  # 每个冲突最多尝试的不同组合数
 
     def _compute_metrics(self, paths: Dict[int, List]) -> Tuple[float, float]:
         """计算路径的 makespan 和 total_cost"""
@@ -101,6 +104,7 @@ class CBS:
             steps = len(path) - 1
             if steps > max_len:
                 max_len = steps
+            # 修正：移动次数统计
             moves = 0
             for i in range(1, len(path)):
                 if path[i] != path[i-1]:
@@ -129,8 +133,10 @@ class CBS:
     def expand_node(self, node: CBSNode, conflict: Dict) -> List[CBSNode]:
         """
         根据冲突生成子节点。
-        对于顶点冲突，首先生成单约束子节点（每个智能体单独禁止），
-        然后如果该冲突被选择的次数超过阈值（3次），则尝试生成一个同时禁止所有智能体的双约束子节点。
+        1. 对于顶点冲突，首先生成单约束子节点（每个智能体单独禁止），
+        2. 跟踪冲突尝试过的约束组合，避免重复
+        3. 如果该冲突被选择的次数超过阈值（3次），则尝试生成一个同时禁止所有智能体的双约束子节点。
+        4. 只对未到达终点的智能体添加约束
         :param node: 当前节点
         :param conflict: 冲突字典，包含 type, time, pos, agents
         :return: 子节点列表（已重规划，可能为空）
@@ -140,12 +146,39 @@ class CBS:
         t = conflict['time']
         agents_ids = conflict['agents']
 
+        # 检查是否是终点冲突，如果是，则只考虑未到达终点的智能体
+        active_agents = []
+        for aid in agents_ids:
+            agent = self.agent_dict[aid]
+            path = node.paths.get(aid)
+            if path and t < len(path) and path[t] != agent.goal:
+                active_agents.append(aid)
+            elif path and t < len(path):  # 到达终点，但仍可能参与冲突
+                active_agents.append(aid)
+        
+        # 如果没有活跃智能体，跳过
+        if not active_agents:
+            return children
+
+        # 记录冲突尝试
+        conflict_key = (ctype, t, conflict['pos'], tuple(sorted(agents_ids)))
+        if conflict_key not in self.conflict_tries:
+            self.conflict_tries[conflict_key] = []
+        
+        tried_combinations = self.conflict_tries[conflict_key]
+        
         if ctype == 'vertex':
             pos = conflict['pos']
-            # 生成单约束子节点
-            for aid in agents_ids:
+            # 生成单约束子节点（仅对活跃智能体）
+            for aid in active_agents:
+                constraint = (t, pos)
+                # 检查是否已经尝试过这种约束
+                constraint_combo = frozenset([(aid, constraint)])
+                if constraint_combo in tried_combinations:
+                    continue
+                
                 print(f"      扩展顶点冲突子节点: 智能体 {aid} 禁止在 t={t} 位于 {pos}")
-                child_node = node.apply_constraint(aid, (t, pos))
+                child_node = node.apply_constraint(aid, constraint)
                 new_path = self._replan(aid, child_node.constraints, node.paths)
                 if new_path is not None:
                     new_paths = node.paths.copy()
@@ -156,44 +189,59 @@ class CBS:
                     child_node.conflict_count = self._compute_conflict_count(child_node)
                     children.append(child_node)
                     print(f"        重规划成功，新路径长度 {len(new_path)}，冲突数 {child_node.conflict_count}")
-                    if len(new_path) > t:
-                        print(f"        新路径在 t={t} 的位置: {new_path[t]}")
+                    
+                    # 记录尝试过的组合
+                    tried_combinations.append(constraint_combo)
+                    if len(tried_combinations) >= self.max_tries_per_conflict:
+                        print(f"        冲突 {conflict_key} 尝试次数已达上限")
+                        break
                 else:
                     print(f"        重规划失败")
 
-            # 获取该冲突的被选次数，如果超过阈值，尝试生成双约束子节点
-            conflict_key = (ctype, t, pos, tuple(sorted(agents_ids)))
-            count = self.conflict_counter.get(conflict_key, 0)
-            print(f"        冲突计数器值: {count} (阈值3)")
-            if count >= 3:  # 阈值设为3，可调整
-                print(f"        冲突已被选择 {count} 次，尝试生成双约束子节点")
-                # 同时禁止所有智能体
-                double_node = node
-                for aid in agents_ids:
-                    double_node = double_node.apply_constraint(aid, (t, pos))
-                # 重规划所有涉及的智能体
-                new_paths = node.paths.copy()
-                all_success = True
-                for aid in agents_ids:
-                    new_path = self._replan(aid, double_node.constraints, node.paths)
-                    if new_path is None:
-                        all_success = False
-                        print(f"        智能体 {aid} 重规划失败，双约束子节点放弃")
+            # 如果冲突尝试次数过多，尝试双约束
+            if len(tried_combinations) >= 3 and len(active_agents) > 1:
+                print(f"        冲突已被选择多次，尝试生成双约束子节点")
+                # 尝试禁止两个活跃智能体的组合
+                for i in range(len(active_agents)):
+                    for j in range(i+1, len(active_agents)):
+                        aid1, aid2 = active_agents[i], active_agents[j]
+                        constraint1 = (t, pos)
+                        constraint2 = (t, pos)
+                        
+                        constraint_combo = frozenset([(aid1, constraint1), (aid2, constraint2)])
+                        if constraint_combo in tried_combinations:
+                            continue
+                        
+                        double_node = node
+                        double_node = double_node.apply_constraint(aid1, constraint1)
+                        double_node = double_node.apply_constraint(aid2, constraint2)
+                        
+                        # 重规划两个智能体
+                        new_paths = node.paths.copy()
+                        success = True
+                        for aid in [aid1, aid2]:
+                            new_path = self._replan(aid, double_node.constraints, node.paths)
+                            if new_path is None:
+                                success = False
+                                break
+                            new_paths[aid] = new_path
+                            
+                        if success:
+                            double_node.paths = new_paths
+                            double_node.makespan, double_node.total_cost = self._compute_metrics(new_paths)
+                            double_node.conflict_count = self._compute_conflict_count(double_node)
+                            children.append(double_node)
+                            print(f"        双约束子节点生成成功，makespan={double_node.makespan}, total_cost={double_node.total_cost}，冲突数 {double_node.conflict_count}")
+                            
+                            tried_combinations.append(constraint_combo)
+                            break  # 成功后跳出，避免生成过多双约束节点
+                    if len([c for c in tried_combinations if len(c) == 2]) > 0:  # 已生成双约束
                         break
-                    new_paths[aid] = new_path
-                if all_success:
-                    double_node.paths = new_paths
-                    double_node.makespan, double_node.total_cost = self._compute_metrics(new_paths)
-                    double_node.conflict_count = self._compute_conflict_count(double_node)
-                    children.append(double_node)
-                    print(f"        双约束子节点生成成功，makespan={double_node.makespan}, total_cost={double_node.total_cost}，冲突数 {double_node.conflict_count}")
-                else:
-                    print(f"        双约束子节点生成失败")
 
         elif ctype == 'edge':
-            if len(agents_ids) < 2:
+            if len(active_agents) < 2:
                 return children
-            aid, bid = agents_ids[0], agents_ids[1]
+            aid, bid = active_agents[0], active_agents[1]
             a_path = node.paths.get(aid)
             b_path = node.paths.get(bid)
             if a_path is None or b_path is None or t >= len(a_path) or t >= len(b_path):
@@ -202,38 +250,44 @@ class CBS:
             pos_b_t = b_path[t]
 
             # 子节点1：禁止 a 在 t 时刻位于 pos_a_t
-            print(f"      扩展边冲突子节点: 智能体 {aid} 禁止在 t={t} 位于 {pos_a_t}")
-            child_a = node.apply_constraint(aid, (t, pos_a_t))
-            new_path_a = self._replan(aid, child_a.constraints, node.paths)
-            if new_path_a:
-                new_paths_a = node.paths.copy()
-                new_paths_a[aid] = new_path_a
-                child_a.paths = new_paths_a
-                child_a.makespan, child_a.total_cost = self._compute_metrics(new_paths_a)
-                child_a.conflict_count = self._compute_conflict_count(child_a)
-                children.append(child_a)
-                print(f"        重规划成功，新路径长度 {len(new_path_a)}，冲突数 {child_a.conflict_count}")
-                if len(new_path_a) > t:
-                    print(f"        新路径在 t={t} 的位置: {new_path_a[t]}")
-            else:
-                print(f"        重规划失败")
+            constraint_a = (t, pos_a_t)
+            constraint_combo_a = frozenset([(aid, constraint_a)])
+            if constraint_combo_a not in tried_combinations:
+                print(f"      扩展边冲突子节点: 智能体 {aid} 禁止在 t={t} 位于 {pos_a_t}")
+                child_a = node.apply_constraint(aid, constraint_a)
+                new_path_a = self._replan(aid, child_a.constraints, node.paths)
+                if new_path_a:
+                    new_paths_a = node.paths.copy()
+                    new_paths_a[aid] = new_path_a
+                    child_a.paths = new_paths_a
+                    child_a.makespan, child_a.total_cost = self._compute_metrics(new_paths_a)
+                    child_a.conflict_count = self._compute_conflict_count(child_a)
+                    children.append(child_a)
+                    print(f"        重规划成功，新路径长度 {len(new_path_a)}，冲突数 {child_a.conflict_count}")
+                    
+                    tried_combinations.append(constraint_combo_a)
+                else:
+                    print(f"        重规划失败")
 
             # 子节点2：禁止 b 在 t 时刻位于 pos_b_t
-            print(f"      扩展边冲突子节点: 智能体 {bid} 禁止在 t={t} 位于 {pos_b_t}")
-            child_b = node.apply_constraint(bid, (t, pos_b_t))
-            new_path_b = self._replan(bid, child_b.constraints, node.paths)
-            if new_path_b:
-                new_paths_b = node.paths.copy()
-                new_paths_b[bid] = new_path_b
-                child_b.paths = new_paths_b
-                child_b.makespan, child_b.total_cost = self._compute_metrics(new_paths_b)
-                child_b.conflict_count = self._compute_conflict_count(child_b)
-                children.append(child_b)
-                print(f"        重规划成功，新路径长度 {len(new_path_b)}，冲突数 {child_b.conflict_count}")
-                if len(new_path_b) > t:
-                    print(f"        新路径在 t={t} 的位置: {new_path_b[t]}")
-            else:
-                print(f"        重规划失败")
+            constraint_b = (t, pos_b_t)
+            constraint_combo_b = frozenset([(bid, constraint_b)])
+            if constraint_combo_b not in tried_combinations:
+                print(f"      扩展边冲突子节点: 智能体 {bid} 禁止在 t={t} 位于 {pos_b_t}")
+                child_b = node.apply_constraint(bid, constraint_b)
+                new_path_b = self._replan(bid, child_b.constraints, node.paths)
+                if new_path_b:
+                    new_paths_b = node.paths.copy()
+                    new_paths_b[bid] = new_path_b
+                    child_b.paths = new_paths_b
+                    child_b.makespan, child_b.total_cost = self._compute_metrics(new_paths_b)
+                    child_b.conflict_count = self._compute_conflict_count(child_b)
+                    children.append(child_b)
+                    print(f"        重规划成功，新路径长度 {len(new_path_b)}，冲突数 {child_b.conflict_count}")
+                    
+                    tried_combinations.append(constraint_combo_b)
+                else:
+                    print(f"        重规划失败")
 
         return children
 
@@ -283,6 +337,7 @@ class CBS:
         :return: 无冲突的路径字典（key=agent_id, value=path），若无解返回 None
         """
         # 根节点：所有智能体独立规划最优路径（无约束）
+        start_time = time.time() 
         root_paths = {}
         root_constraints = {}
         for agent in self.agents:
@@ -308,12 +363,26 @@ class CBS:
         heapq.heappush(self.open_set, (root_node.makespan, root_node.total_cost, root_node.conflict_count, id(root_node), root_node))
 
         iteration = 0
-        MAX_ITER = 500  # 增加最大迭代次数，防止过早终止
+        MAX_ITER = 1000  # 增加最大迭代次数，防止过早终止
         while self.open_set:
+            if time.time() - start_time > getattr(self, 'time_limit', 60.0):
+                print(f"[CBS] 超时 ({getattr(self, 'time_limit', 60.0)}s)，终止搜索。")
+                # 统一返回格式：(Success, Paths, Stats)
+                return False, None, {
+                    'nodes_expanded': len(self.expanded_signatures), 
+                    'reason': 'timeout',
+                    'makespan': -1,
+                    'cost': -1
+                    }
             iteration += 1
             if iteration > MAX_ITER:
                 print(f"达到最大迭代次数 {MAX_ITER}，可能陷入死锁，终止搜索。")
-                return None
+                return False, None, {
+                    'nodes_expanded': len(self.expanded_signatures),
+                    'reason': 'max_iter',
+                    'makespan': -1,
+                    'cost': -1
+                }
 
             _, _, _, _, node = heapq.heappop(self.open_set)
             print(f"\n===== 迭代 {iteration} =====")
@@ -328,13 +397,20 @@ class CBS:
                         start = path[0]
                         goal = path[-1]
                         length = len(path)-1
-                        print(f"  智能体 {agent.id_str}: 起点 {start} -> 终点 {goal}, 步数 {length}, 路径前5步: {path[:5]}")
+                        # 计算移动次数
+                        moves = 0
+                        for i in range(1, len(path)):
+                            if path[i] != path[i-1]:
+                                moves += 1
+                        print(f"  智能体 {agent.id_str}: 起点 {start} -> 终点 {goal}, 步数 {length}, 移动次数 {moves}, 路径前5步: {path[:5]}")
                     else:
                         print(f"  智能体 {agent.id_str}: 无路径")
                 input("按回车键继续下一步（输入 q 退出）...")
 
             # 补齐路径至全局最大时间
-            max_len = max(len(p) for p in node.paths.values())
+            max_len = max(len(p) for p in node.paths.values()) if node.paths else 0
+            if max_len == 0:
+                continue
             extended_paths = {}
             for aid, path in node.paths.items():
                 if len(path) < max_len:
@@ -356,7 +432,13 @@ class CBS:
             if not conflicts:
                 self.update_best(node)
                 print(f"找到无冲突解！迭代次数：{iteration}，makespan：{node.makespan}，total_cost：{node.total_cost}")
-                return node.paths
+                stats = {
+                    'nodes_expanded': len(self.expanded_signatures),
+                    'reason': 'success',
+                    'makespan': node.makespan,
+                    'cost': node.total_cost
+                }
+                return True, node.paths, stats
 
             # 计算冲突严重程度并排序
             priority_func = lambda a: a.agent_class.width + a.agent_class.height
@@ -364,22 +446,18 @@ class CBS:
                 c['severity'] = assign_severity(c, self.agents, priority_func)
             sorted_conflicts = sort_conflicts(conflicts)
 
-            # 选择冲突：优先选择被选择次数较少的冲突，避免反复处理同一冲突
+            # 选择冲突：优先选择未被尝试过或尝试次数较少的冲突
             chosen_conflict = None
             for c in sorted_conflicts:
                 # 生成冲突唯一标识
                 key = (c['type'], c['time'], c['pos'], tuple(sorted(c['agents'])))
-                count = self.conflict_counter.get(key, 0)
-                if count < 10:  # 阈值设为10，可调整
+                tries = len(self.conflict_tries.get(key, []))
+                if tries < self.max_tries_per_conflict:
                     chosen_conflict = c
-                    self.conflict_counter[key] = count + 1
                     break
             if chosen_conflict is None:
-                # 如果所有冲突都被选择过多次，则强制选择第一个
+                # 如果所有冲突都尝试过了，选择第一个
                 chosen_conflict = sorted_conflicts[0]
-                key = (chosen_conflict['type'], chosen_conflict['time'], chosen_conflict['pos'], tuple(sorted(chosen_conflict['agents'])))
-                self.conflict_counter[key] = self.conflict_counter.get(key, 0) + 1
-                print("所有冲突均被选择多次，强制选择第一个。")
 
             print(f"选择冲突: 类型={chosen_conflict['type']}, 时间={chosen_conflict['time']}, "
                   f"位置={chosen_conflict['pos']}, 智能体={chosen_conflict['agents']}, severity={chosen_conflict['severity']:.2f}")
@@ -404,4 +482,10 @@ class CBS:
                 print(f"  子节点加入开放集: makespan={child.makespan}, total_cost={child.total_cost}, conflict_count={child.conflict_count}")
 
         print("CBS 搜索结束，无解。")
+        return False, None, {
+            'nodes_expanded': len(self.expanded_signatures),
+            'reason': 'no_solution',
+            'makespan': -1,
+            'cost': -1
+        }
         return None

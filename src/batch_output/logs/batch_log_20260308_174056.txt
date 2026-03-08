@@ -1,0 +1,40 @@
+[17:40:56] ============================================================
+[17:40:56] 🚀 批量测试启动 (优化版)
+[17:40:56] 地图: 20x20, 障碍率: 0.2
+[17:40:56] 配置: [{'w': 2, 'h': 2, 'ratio': 0.25}, {'w': 1, 'h': 1, 'ratio': 0.75}]
+[17:40:56] 规模: [4, 6, 8, 10], 重复: 5
+[17:40:56] 日志: batch_output\logs\batch_log_20260308_174056.txt
+[17:40:56] ============================================================
+[17:40:56] 
+>>> 测试组: 4 个智能体
+[17:40:56] 💥 [异常] Seed=2424, N=4, ID=1: GridMap.__init__() takes 3 positional arguments but 4 were given
+[17:40:56] 💥 [异常] Seed=2425, N=4, ID=2: GridMap.__init__() takes 3 positional arguments but 4 were given
+[17:40:56] 💥 [异常] Seed=2426, N=4, ID=3: GridMap.__init__() takes 3 positional arguments but 4 were given
+[17:40:56] 💥 [异常] Seed=2427, N=4, ID=4: GridMap.__init__() takes 3 positional arguments but 4 were given
+[17:40:56] 💥 [异常] Seed=2428, N=4, ID=5: GridMap.__init__() takes 3 positional arguments but 4 were given
+[17:40:56]   📊 结果: 成功率 0.0% (全组失败，请检查地图或配置)
+[17:40:56] 
+>>> 测试组: 6 个智能体
+[17:40:56] 💥 [异常] Seed=2624, N=6, ID=1: GridMap.__init__() takes 3 positional arguments but 4 were given
+[17:40:56] 💥 [异常] Seed=2625, N=6, ID=2: GridMap.__init__() takes 3 positional arguments but 4 were given
+[17:40:56] 💥 [异常] Seed=2626, N=6, ID=3: GridMap.__init__() takes 3 positional arguments but 4 were given
+[17:40:56] 💥 [异常] Seed=2627, N=6, ID=4: GridMap.__init__() takes 3 positional arguments but 4 were given
+[17:40:56] 💥 [异常] Seed=2628, N=6, ID=5: GridMap.__init__() takes 3 positional arguments but 4 were given
+[17:40:56]   📊 结果: 成功率 0.0% (全组失败，请检查地图或配置)
+[17:40:56] 
+>>> 测试组: 8 个智能体
+[17:40:56] 💥 [异常] Seed=2824, N=8, ID=1: GridMap.__init__() takes 3 positional arguments but 4 were given
+[17:40:56] 💥 [异常] Seed=2825, N=8, ID=2: GridMap.__init__() takes 3 positional arguments but 4 were given
+[17:40:56] 💥 [异常] Seed=2826, N=8, ID=3: GridMap.__init__() takes 3 positional arguments but 4 were given
+[17:40:56] 💥 [异常] Seed=2827, N=8, ID=4: GridMap.__init__() takes 3 positional arguments but 4 were given
+[17:40:56] 💥 [异常] Seed=2828, N=8, ID=5: GridMap.__init__() takes 3 positional arguments but 4 were given
+[17:40:56]   📊 结果: 成功率 0.0% (全组失败，请检查地图或配置)
+[17:40:56] 
+>>> 测试组: 10 个智能体
+[17:40:56] 💥 [异常] Seed=3024, N=10, ID=1: GridMap.__init__() takes 3 positional arguments but 4 were given
+[17:40:56] 💥 [异常] Seed=3025, N=10, ID=2: GridMap.__init__() takes 3 positional arguments but 4 were given
+[17:40:56] 💥 [异常] Seed=3026, N=10, ID=3: GridMap.__init__() takes 3 positional arguments but 4 were given
+[17:40:56] 💥 [异常] Seed=3027, N=10, ID=4: GridMap.__init__() takes 3 positional arguments but 4 were given
+[17:40:56] 💥 [异常] Seed=3028, N=10, ID=5: GridMap.__init__() takes 3 positional arguments but 4 were given
+[17:40:56]   📊 结果: 成功率 0.0% (全组失败，请检查地图或配置)
+[17:40:58] 📈 图表已保存: batch_output\images\performance_analysis.png

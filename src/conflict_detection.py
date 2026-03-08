@@ -53,9 +53,9 @@ def detect_conflicts(reservation_table: ReservationTable,
             continue
         path_map[aid] = path
         occ = {}
-        for t, pos in enumerate(path):
+        for t_idx, pos in enumerate(path):
             cells = agent.agent_class.get_occupied_cells(pos)
-            occ[t] = set(cells)
+            occ[t_idx] = set(cells)
         agent_occupancy[aid] = occ
 
     # 遍历所有智能体对
@@ -70,19 +70,19 @@ def detect_conflicts(reservation_table: ReservationTable,
             path_b = path_map[bid]
             # 取最大公共时间范围
             max_t = min(len(path_a), len(path_b)) - 1
-            for t in range(max_t):
+            for t_idx in range(max_t):
                 # 确保 t 和 t+1 都存在
-                if t not in occ_a or t+1 not in occ_a or t not in occ_b or t+1 not in occ_b:
+                if t_idx not in occ_a or t_idx+1 not in occ_a or t_idx not in occ_b or t_idx+1 not in occ_b:
                     continue
-                cells_a_t = occ_a[t]
-                cells_a_t1 = occ_a[t+1]
-                cells_b_t = occ_b[t]
-                cells_b_t1 = occ_b[t+1]
+                cells_a_t = occ_a[t_idx]
+                cells_a_t1 = occ_a[t_idx+1]
+                cells_b_t = occ_b[t_idx]
+                cells_b_t1 = occ_b[t_idx+1]
                 if (cells_a_t & cells_b_t1) and (cells_a_t1 & cells_b_t):
                     conflicts.append({
                         'type': 'edge',
-                        'time': t,
-                        'pos': (path_a[t], path_a[t+1]),
+                        'time': t_idx,
+                        'pos': (path_a[t_idx], path_a[t_idx+1]),
                         'agents': [aid, bid]
                     })
 

@@ -19,9 +19,10 @@ def astar(agent_instance: AgentInstance,
           weight_bridge: float = 10.0,
           weight_res: float = 1.0,
           constraints: List[Tuple[int, Tuple[int, int]]] = None,
-          wait_cost: float = 0 ) -> Optional[List[Tuple[int, int]]]:
+          wait_cost: float = 1.0 ) -> Optional[List[Tuple[int, int]]]:
     """
     使用 A* 算法为单个智能体规划路径，支持 CBS 硬约束（禁止在特定时刻占据特定位置）。
+    修正：路径代价计算移动次数，而非时间步总数。
 
     :param agent_instance: 智能体实例（包含起点、终点、尺寸）
     :param passable_graph: 该类智能体的可通行子图
@@ -85,28 +86,35 @@ def astar(agent_instance: AgentInstance,
         return abs(pos[0] - goal[0]) + abs(pos[1] - goal[1])
 
     # 优先队列元素：(f, g, t, pos)
+    # g 表示路径代价（移动次数），t 表示时间步
     open_set = []
     # 初始状态
     t0 = 0
-    g0 = step_penalty(start, t0)
-    if g0 == float('inf'):  # 起点被硬约束禁止
+    penalty0 = step_penalty(start, t0)
+    if penalty0 == float('inf'):  # 起点被硬约束禁止
         return None
+    g0 = penalty0  # 初始g值为penalty
     f0 = g0 + heuristic(start)
     heapq.heappush(open_set, (f0, g0, t0, start))
 
+    # 状态: (pos, t) -> g_value
     g_score: Dict[Tuple[Tuple[int, int], int], float] = {(start, t0): g0}
-    came_from: Dict[Tuple[Tuple[int, int], int], Tuple[Tuple[int, int], int]] = {}
+    # 记录父节点: (pos, t) -> ((parent_pos, parent_t), action_is_wait)
+    came_from: Dict[Tuple[Tuple[int, int], int], Tuple[Tuple[Tuple[int, int], int], bool]] = {}
 
     while open_set:
         f, g, t, pos = heapq.heappop(open_set)
 
+        # 到达终点后，继续等待直到预约表中不再有冲突
         if pos == goal:
+            # 找到终点后，继续等待，直到到达终点的智能体不会与其他智能体冲突
+            # 但我们返回的是到达终点的路径，不包括无限等待
             # 重建路径
             path = []
             state = (pos, t)
             while state in came_from:
                 path.append(state[0])
-                state = came_from[state]
+                state, _ = came_from[state]  # unpack parent state and action type
             path.append(start)
             path.reverse()
             return path
@@ -120,24 +128,26 @@ def astar(agent_instance: AgentInstance,
             penalty = step_penalty(nbr, nt)
             if penalty == float('inf'):
                 continue
-            ng = g + 1 + penalty  # 移动代价固定为1
+            # 移动的代价是1（移动次数）+ penalty
+            ng = g + 1 + penalty  # g now represents cumulative cost including moves and penalties
             state = (nbr, nt)
             if ng < g_score.get(state, float('inf')):
                 g_score[state] = ng
                 f_val = ng + heuristic(nbr)
                 heapq.heappush(open_set, (f_val, ng, nt, nbr))
-                came_from[state] = (pos, t)
+                came_from[state] = ((pos, t), False)  # False means moved
 
         # 扩展等待动作（使用可调的等待代价）
         nt = t + 1
         penalty = step_penalty(pos, nt)
         if penalty != float('inf'):
-            ng = g + wait_cost + penalty  # 等待代价为 wait_cost
+            # 等待的代价是wait_cost + penalty
+            ng = g + wait_cost + penalty
             state = (pos, nt)
             if ng < g_score.get(state, float('inf')):
                 g_score[state] = ng
                 f_val = ng + heuristic(pos)
                 heapq.heappush(open_set, (f_val, ng, nt, pos))
-                came_from[state] = (pos, t)
+                came_from[state] = ((pos, t), True)  # True means waited
 
     return None
