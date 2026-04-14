@@ -101,9 +101,9 @@ class AgentInstance:
         :param goal: 终点左上角坐标 (x, y)
         """
         self.agent_class = agent_class
-        self.id = instance_id                     # 同类内数字编号
+        self.id = instance_id                     #类内数字编号
         self.category = agent_class.category
-        self.global_id: Optional[int] = None      # 全局唯一ID（由任务生成器赋值）
+        self.global_id: Optional[int] = None      #全局唯一ID（由任务生成器赋值）
         letter = CATEGORY_LETTERS.get(self.category, '?')
         self.id_str = f"{letter}{instance_id}"    # 例如 A0, B1
         self.start = start

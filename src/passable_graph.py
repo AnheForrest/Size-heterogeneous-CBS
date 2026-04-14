@@ -19,9 +19,9 @@ class PassableGraph:
         :param category: 智能体类别编号
         """
         self.category = category
-        self.V: List[Tuple[int, int]] = []               # 顶点列表（合法左上角坐标）
-        self.E: Dict[Tuple[int, int], List[Tuple[int, int]]] = {}  # 邻接表
-        self.bridges: Set[Tuple[int, int]] = set()       # 桥栅格集合（物理栅格坐标）
+        self.V: List[Tuple[int, int]] = []               #顶点列表（合法左上角坐标）
+        self.E: Dict[Tuple[int, int], List[Tuple[int, int]]] = {}  #可达矩阵邻接表
+        self.bridges: Set[Tuple[int, int]] = set()       #桥栅格集合（物理栅格坐标）
         self._pos_to_index: Dict[Tuple[int, int], int] = {}  # 位置到索引的映射，用于桥检测
 
     def build_from(self, grid_map: GridMap, agent_class: AgentClass) -> 'PassableGraph':
@@ -103,6 +103,7 @@ class PassableGraph:
         visited = [False] * n
         bridges_edges = []  # 存储桥边 (u, v)
 
+        #？？？
         def dfs(at, parent, depth):
             visited[at] = True
             ids[at] = low[at] = depth
@@ -123,7 +124,7 @@ class PassableGraph:
             if not visited[i]:
                 dfs(i, -1, 0)
 
-        # 将桥边涉及的顶点覆盖的所有栅格加入桥栅格集合
+        #将桥边涉及的顶点覆盖的所有栅格加入桥栅格集合
         bridge_cells = set()
         for u_pos, v_pos in bridges_edges:
             for pos in [u_pos, v_pos]:

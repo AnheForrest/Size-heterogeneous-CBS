@@ -7,6 +7,8 @@ print("Script started", file=sys.stderr)
 
 import random
 import matplotlib.pyplot as plt
+import os
+from datetime import datetime
 
 from gridmap import GridMap
 from sh_agent import AgentClass
@@ -64,6 +66,24 @@ def get_non_negative_int(prompt, default=None):
                 print("请输入非负整数。")
         except ValueError:
             print("请输入整数。")
+
+def get_yes_no(prompt, default='n'):
+    """获取是/否输入"""
+    while True:
+        val = input(prompt).strip().lower()
+        if not val:
+            return default == 'y'
+        if val in ['y', 'yes', '是']:
+            return True
+        elif val in ['n', 'no', '否']:
+            return False
+        else:
+            print("请输入 y 或 n。")
+
+def generate_output_filename(prefix, extension):
+    """生成带时间戳的输出文件名"""
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    return f"{prefix}_{timestamp}.{extension}"
 
 def main():
     try:
@@ -130,7 +150,7 @@ def main():
         tasks, failed_requests = generate_tasks(
             agent_classes,
             counts,
-            grid,                       # 第四个参数：grid_map
+            grid,
             passable_graphs,
             existing_occupied=None,
             max_attempts_per_agent=1000
@@ -138,20 +158,17 @@ def main():
         print(f"    成功生成任务数: {len(tasks)}")
         if failed_requests:
             print(f"    有 {len(failed_requests)} 个智能体因起点/终点冲突或不可达而生成失败。")
-            # 询问是否重试
             resp = input("是否重新生成这些失败的任务？(y/n): ").strip().lower()
             if resp == 'y':
-                # 收集当前已成功任务的占用栅格
                 occupied = set()
                 for t in tasks:
                     occupied.update(t.agent_class.get_occupied_cells(t.start))
                     occupied.update(t.agent_class.get_occupied_cells(t.goal))
-                # 尝试重新生成失败的任务
                 new_tasks = retry_failed_tasks(
                     failed_requests,
                     agent_classes,
                     passable_graphs,
-                    existing_occupied=occupied,   # occupied 会被更新
+                    existing_occupied=occupied,
                     max_attempts=10
                 )
                 tasks.extend(new_tasks)
@@ -161,7 +178,6 @@ def main():
         else:
             print("    所有任务生成成功，无失败请求。")
 
-        # 可选：再次过滤（确保连通性，但生成时已保证）
         tasks = filter_feasible_tasks(tasks, passable_graphs)
         print(f"    过滤后剩余任务数: {len(tasks)}")
 
@@ -191,35 +207,38 @@ def main():
         all_bridges = set()
         for pg in passable_graphs.values():
             all_bridges.update(pg.bridges)
-        # 创建一个仅包含桥信息的空预约表（供 CBS 内部使用）
         empty_reservation = ReservationTable(bridge_cells=all_bridges)
 
-        # 创建 CBS 对象
         cbs = CBS(
             agents=tasks,
             passable_graphs=passable_graphs,
-            reservation_table=empty_reservation,   # 空预约表（仅含桥信息）
+            reservation_table=empty_reservation,
             cr=cr
         )
 
-        # 询问是否进入交互调试模式
         interactive_mode = input("\n是否进入交互调试模式？(y/n, 默认 n): ").strip().lower() == 'y'
 
         # ==================== 7. 调用 CBS 求解 ====================
         print("\n[7] 启动 CBS 搜索...")
-        solution = cbs.search(interactive=interactive_mode)
+        result = cbs.search(interactive=interactive_mode)
 
-        if solution is None:
+        if isinstance(result, tuple) and len(result) == 3:
+            success, solution, stats = result
+        else:
+            success = result is not None
+            solution = result
+            stats = None
+
+        if not success or solution is None:
             print("CBS 未找到可行解，程序退出。")
             return
         else:
             print("CBS 找到解，正在处理结果...")
-            # 将解路径赋给对应的智能体
             for agent in tasks:
                 if agent.global_id in solution:
                     agent.set_path(solution[agent.global_id])
                 else:
-                    agent.set_path([])   # 理论上不会发生
+                    agent.set_path([])
 
         # ==================== 8. 结果输出 ====================
         print("\n" + "=" * 50)
@@ -239,28 +258,72 @@ def main():
         print(f"全局完成时间: {max_time}")
 
         # ==================== 9. 可视化 ====================
-        print("\n[9] 显示静态地图和路径 (请关闭图形窗口以继续)...")
-        # 静态图
-        fig, ax = plt.subplots(1, 1, figsize=(8, 8))
+        output_dir = "output"
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+            print(f"\n    已创建输出目录: {output_dir}/")
+
+        # --- 9.1 静态图 ---
+        print("\n[9.1] 生成静态路径图...")
+        save_static = get_yes_no("    是否保存静态图到本地？(y/n, 默认 n): ", default='n')
+        
+        fig, ax = plt.subplots(1, 1, figsize=(10, 10))
         draw_map(grid, ax, show=False)
         draw_agents(tasks, current_time=None, ax=ax, show=False)
         for task in tasks:
             if task.path:
                 draw_path(task, ax=ax, show=False)
-        plt.title("Static Map with Start, Goal, and Paths")
-        plt.show()
+        plt.title(f"Static Map with Start, Goal, and Paths\nAgents: {len(tasks)}, Makespan: {max_time}")
+        plt.tight_layout()
+        
+        if save_static:
+            static_filename = os.path.join(output_dir, generate_output_filename("static_map", "png"))
+            plt.savefig(static_filename, dpi=300, bbox_inches='tight')
+            print(f"    静态图已保存：{static_filename}")
+        
+        show_static = get_yes_no("    是否在屏幕上显示静态图？(y/n, 默认 y): ", default='y')
+        if show_static:
+            plt.show()
+        else:
+            plt.close(fig)
 
-        # 动画
+        # --- 9.2 动画 ---
         if any(task.path for task in tasks):
-            print("\n生成动画 (请关闭动画窗口以结束程序)...")
-            animate_solution(tasks, grid, interval=500, save_path=None)
+            print("\n[9.2] 生成动画...")
+            save_animation = get_yes_no("    是否保存动画到本地？(y/n, 默认 n): ", default='n')
+            
+            animation_file = None
+            if save_animation:
+                print("    可选格式：mp4 (需要ffmpeg), gif, webm")
+                anim_format = input("    输入动画格式 (默认gif): ").strip().lower()
+                if not anim_format:
+                    anim_format = "gif"
+                animation_file = os.path.join(output_dir, generate_output_filename("animation", anim_format))
+                print(f"    动画将保存为：{animation_file}")
+            
+            interval = get_positive_int("    动画帧间隔 (毫秒) [默认500]: ", default=500)
+            
+            # 修复：移除 show 参数，save_path=None 时自动显示
+            animate_solution(
+                tasks, 
+                grid, 
+                interval=interval, 
+                save_path=animation_file
+            )
+            
+            if animation_file and os.path.exists(animation_file):
+                print(f"    动画已保存：{animation_file}")
         else:
             print("\n没有有效路径，无法生成动画。")
 
-        print("\n程序正常结束。")
+        # ==================== 10. 完成 ====================
+        print("\n" + "=" * 50)
+        print("程序正常结束。")
+        print(f"输出目录：{os.path.abspath(output_dir)}/")
+        print("=" * 50)
 
     except Exception as e:
-        print(f"\n发生错误: {e}")
+        print(f"\n发生错误：{e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)

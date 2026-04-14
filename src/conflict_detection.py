@@ -40,6 +40,9 @@ def detect_conflicts(reservation_table: ReservationTable,
         })
 
     # 2. 边冲突：基于路径信息计算
+    """
+    在预约表里已经完成了边冲突的检测了，这边重新检测一遍是什么意思？
+    """
     # 构建每个智能体每个时间步的占用栅格集合
     agent_occupancy = {}
     path_map = {}  # aid -> path list

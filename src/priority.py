@@ -36,7 +36,6 @@ def sort_tasks_by_priority(tasks: List[AgentInstance]) -> List[AgentInstance]:
     排序规则：
         - 首先按尺寸优先级（width+height）降序。
         - 若尺寸优先级相同，则按起点到终点的曼哈顿距离升序（距离近的优先）。
-    使用稳定排序，保持相同优先级键的任务相对顺序不变。
 
     :param tasks: AgentInstance 对象列表
     :return: 排序后的新列表

@@ -22,7 +22,7 @@ def astar(agent_instance: AgentInstance,
           wait_cost: float = 1.0 ) -> Optional[List[Tuple[int, int]]]:
     """
     使用 A* 算法为单个智能体规划路径，支持 CBS 硬约束（禁止在特定时刻占据特定位置）。
-    修正：路径代价计算移动次数，而非时间步总数。
+    路径代价计算移动次数，而非时间步总数。
 
     :param agent_instance: 智能体实例（包含起点、终点、尺寸）
     :param passable_graph: 该类智能体的可通行子图
@@ -54,7 +54,7 @@ def astar(agent_instance: AgentInstance,
             constraint_dict[t] = set()
         constraint_dict[t].add(pos)
 
-    # 辅助函数：获取智能体在某个左上角位置占据的所有栅格
+    # 辅助函数：获取智能体在某个左上角位置占据的所有栅格（这个在很多地方都用到了，直接整理到可通行图里面每次调用吧）
     def get_occupied_cells(pos: Tuple[int, int]) -> List[Tuple[int, int]]:
         x, y = pos
         cells = []
@@ -74,6 +74,12 @@ def astar(agent_instance: AgentInstance,
             # 拥堵系数
             total += weight_cr * cr[cx][cy]
             # 桥栅格
+            """
+            桥栅格惩罚是否太高？一个图中必然存在多类智能体的桥栅格，但是真的有必要每次经过桥栅格都做惩罚吗？
+            可不可以同步完成冲突检测，如果确定同一时间步确实占用了某个智能体的桥栅格再惩罚？
+            每步的代价才设为1，桥自己的代价就是10，太高了
+            在桥栅格没有发挥桥作用，而只是作为普通栅格存在的情况下，真的需要让其他智能体避让它吗？
+            """
             if (cx, cy) in passable_graph.bridges:
                 total += weight_bridge
             # 预约表占用
@@ -128,14 +134,14 @@ def astar(agent_instance: AgentInstance,
             penalty = step_penalty(nbr, nt)
             if penalty == float('inf'):
                 continue
-            # 移动的代价是1（移动次数）+ penalty
-            ng = g + 1 + penalty  # g now represents cumulative cost including moves and penalties
+            # 移动的代价是1（移动次数）+ penalty(惩罚）)
+            ng = g + 1 + penalty  
             state = (nbr, nt)
             if ng < g_score.get(state, float('inf')):
                 g_score[state] = ng
                 f_val = ng + heuristic(nbr)
                 heapq.heappush(open_set, (f_val, ng, nt, nbr))
-                came_from[state] = ((pos, t), False)  # False means moved
+                came_from[state] = ((pos, t), False)  # False代表发生了移动
 
         # 扩展等待动作（使用可调的等待代价）
         nt = t + 1
@@ -148,6 +154,6 @@ def astar(agent_instance: AgentInstance,
                 g_score[state] = ng
                 f_val = ng + heuristic(pos)
                 heapq.heappush(open_set, (f_val, ng, nt, pos))
-                came_from[state] = ((pos, t), True)  # True means waited
+                came_from[state] = ((pos, t), True)  # True代表在原地等待
 
     return None

@@ -1,8 +1,10 @@
 """
 任务生成模块
 为每类智能体随机生成指定数量的任务（起点和终点），并确保：
-1. 每个任务的起点和终点在同一连通分量中（可达）
+1. 每个任务的起点和终点在同一连通分量中（初步想法是用于无解检测，但是生成太多无解任务不利于测试）
 2. 不同任务的起点/终点所占据的栅格互不重叠
+
+！！！generate_tasks和retry_failed_tasks的核心区别是什么呢？仅仅是max_attempts?这种情况下真的有必要写两个方法吗？
 """
 
 import random
@@ -17,7 +19,7 @@ _next_global_id = 0
 
 def generate_tasks(agent_classes: List[AgentClass],
                    counts: List[int],
-                   grid_map: GridMap,  # 保留参数以兼容 main.py，实际未使用
+                   grid_map: GridMap,  
                    passable_graphs: Dict[int, PassableGraph],
                    existing_occupied: Optional[Set[Tuple[int, int]]] = None,
                    max_attempts_per_agent: int = 1000) -> Tuple[List[AgentInstance], List[Tuple[int, int]]]:
@@ -31,8 +33,8 @@ def generate_tasks(agent_classes: List[AgentClass],
 
     :param agent_classes: 智能体类别列表
     :param counts: 每类智能体需要生成的数量，顺序与 agent_classes 一致
-    :param grid_map: 基底地图（保留参数以兼容，实际未使用）
-    :param passable_graphs: 字典，键为类别编号，值为该类对应的 PassableGraph 对象
+    :param grid_map: 基底地图
+    :param passable_graphs: 字典，对应智能体类别和它的可通行图，键为类别编号，值为该类对应的 PassableGraph 对象
     :param existing_occupied: 已占用的栅格坐标集合（起点和终点的并集），若为 None 则初始化为空集
     :param max_attempts_per_agent: 每个智能体生成的最大尝试次数
     :return: (成功任务列表, 失败请求列表) 失败请求每个元素为 (category, instance_id)
@@ -45,7 +47,7 @@ def generate_tasks(agent_classes: List[AgentClass],
     if existing_occupied is None:
         occupied_all: Set[Tuple[int, int]] = set()
     else:
-        occupied_all = set(existing_occupied)  # 复制一份，避免修改原集合
+        occupied_all = set(existing_occupied)  #复制一份，避免修改原集合
 
     tasks: List[AgentInstance] = []
     failed_requests: List[Tuple[int, int]] = []  # 每个元素 (category, instance_id)
@@ -123,7 +125,7 @@ def retry_failed_tasks(failed_requests: List[Tuple[int, int]],
     :param failed_requests: 失败请求列表，每个元素为 (category, instance_id)
     :param agent_classes: 智能体类别列表（用于获取类别对象）
     :param passable_graphs: 可通行子图字典
-    :param existing_occupied: 已成功任务的起点/终点占用栅格集合（会被更新）
+    :param existing_occupied: 已成功任务的起点/终点占用栅格集合（每个智能体起终点设定后会被更新）
     :param max_attempts: 每个失败任务的最大尝试次数
     :return: 新生成的成功任务列表
     """
@@ -181,7 +183,7 @@ def filter_feasible_tasks(tasks: List[AgentInstance],
                           passable_graphs: Dict[int, PassableGraph]) -> List[AgentInstance]:
     """
     剔除起点到终点不可达的任务，并打印警告信息。
-    （在 generate_tasks 已保证连通性后，此函数通常返回原列表，仅用于兼容旧代码）
+    
     """
     feasible = []
     for task in tasks:

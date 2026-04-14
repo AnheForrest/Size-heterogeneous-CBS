@@ -15,7 +15,6 @@ class ReservationTable:
     def __init__(self, bridge_cells: Set[Tuple[int, int]] = None):
         """
         初始化预约表。
-
         :param bridge_cells: 桥栅格坐标集合，用于标记时空点是否为桥。
         """
         self.table: Dict[Tuple[int, int, int], Dict] = {}
@@ -62,7 +61,7 @@ class ReservationTable:
             for cx, cy in cells:
                 key = (cx, cy, t)
                 if key not in self.table:
-                    continue  # 理论上不应发生
+                    continue  #？？？理论上不应发生
                 self.table[key]['count'] -= 1
                 self.table[key]['agents'].discard(agent_id)
                 if self.table[key]['count'] <= 0:
@@ -104,7 +103,7 @@ class ReservationTable:
         :param agents: 智能体实例列表，每个实例需有 id, path, agent_class
         :return: 边冲突列表，每个元素为 (t, pos_a_t, pos_a_t1, agent_id_a, agent_id_b)
                  其中 pos_a_t 为智能体 a 在 t 时刻的左上角坐标，pos_a_t1 为 t+1 时刻的坐标。
-                 注意：冲突是对称的，只记录一对。
+                 冲突是对称的，只记录一对。
         """
         # 为每个智能体预先计算每个时间步的占据栅格集合，避免重复计算
         agent_occupancy = {}  # agent_id -> {t: set_of_cells}
