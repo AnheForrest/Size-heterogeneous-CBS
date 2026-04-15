@@ -1,0 +1,301 @@
+algorithm,total_agents,trial_id,seed,success,time,makespan,cost,nodes,error
+classic,5,1,83084,True,0.006908416748046875,20,67,4,
+classic,5,2,2908,False,5.026202440261841,-1,-1,2042,timeout
+classic,5,3,67904,False,5.002725124359131,-1,-1,2096,timeout
+classic,5,4,65040,False,5.002490520477295,-1,-1,1888,timeout
+classic,5,5,86185,True,0.02849125862121582,24,69,60,
+classic,5,6,65630,True,0.006000995635986328,21,68,0,
+classic,5,7,85128,True,0.040430545806884766,28,87,4,
+classic,5,8,78702,True,0.0059528350830078125,28,77,0,
+classic,5,9,10840,True,0.005774259567260742,14,41,0,
+classic,5,10,36285,True,0.011972665786743164,23,98,2,
+classic,5,11,76572,True,0.007696628570556641,22,76,0,
+classic,5,12,51707,False,5.004035711288452,-1,-1,2858,timeout
+classic,5,13,65345,True,0.010526657104492188,26,75,12,
+classic,5,14,37548,False,5.008497714996338,-1,-1,2604,timeout
+classic,5,15,32081,True,0.005818605422973633,24,87,0,
+classic,5,16,95778,True,0.007337331771850586,30,79,2,
+classic,5,17,54985,True,0.013330936431884766,28,84,2,
+classic,5,18,5288,True,0.007437944412231445,25,86,2,
+classic,5,19,72190,False,5.003878593444824,-1,-1,3598,timeout
+classic,5,20,59008,False,5.005302667617798,-1,-1,1700,timeout
+classic,5,21,64627,True,0.002875089645385742,12,38,0,
+classic,5,22,22276,True,0.002674102783203125,17,46,0,
+classic,5,23,31216,True,0.009861946105957031,21,76,8,
+classic,5,24,27768,True,0.008362770080566406,26,84,6,
+classic,5,25,2642,True,0.007101535797119141,24,75,2,
+classic,5,26,23314,True,0.006079912185668945,30,75,2,
+classic,5,27,19817,True,0.004781484603881836,22,77,4,
+classic,5,28,97577,True,0.004874467849731445,29,91,0,
+classic,5,29,11165,True,0.003283977508544922,16,49,0,
+classic,5,30,47593,True,0.007035493850708008,32,75,2,
+classic,5,31,27322,True,0.009676218032836914,29,98,0,
+classic,5,32,14618,True,0.004210472106933594,23,57,2,
+classic,5,33,75826,True,0.008400440216064453,31,85,4,
+classic,5,34,77780,True,0.005162239074707031,28,99,0,
+classic,5,35,15896,True,0.004164934158325195,19,73,0,
+classic,5,36,6946,True,0.0044400691986083984,25,75,0,
+classic,5,37,40490,True,0.005532979965209961,20,61,2,
+classic,5,38,33797,True,0.007755279541015625,15,54,6,
+classic,5,39,17704,True,0.009734153747558594,25,90,10,
+classic,5,40,36033,True,0.024405479431152344,25,76,0,
+classic,5,41,25647,True,0.003753185272216797,14,43,2,
+classic,5,42,87657,True,0.0035257339477539062,21,53,0,
+classic,5,43,20288,True,0.003945112228393555,26,71,0,
+classic,5,44,83858,True,0.004700899124145508,26,90,0,
+classic,5,45,18869,True,0.004343748092651367,25,86,0,
+classic,5,46,52688,True,0.00506138801574707,22,82,0,
+classic,5,47,62260,True,0.003643035888671875,12,46,2,
+classic,5,48,36692,True,0.00408172607421875,33,67,0,
+classic,5,49,62246,True,0.009543180465698242,20,89,6,
+classic,5,50,51550,True,0.00313568115234375,18,56,0,
+ours,5,1,44808,False,0.003381013870239258,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,2,51503,False,0.003678560256958008,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,3,95732,False,0.0040035247802734375,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,4,30840,False,0.003648996353149414,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,5,96407,False,0.004698038101196289,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,6,81804,False,0.0033266544342041016,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,7,20418,False,0.0043604373931884766,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,8,69066,False,0.0032625198364257812,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,9,91567,False,0.004708051681518555,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,10,77705,False,0.003804922103881836,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,11,7019,False,0.004819154739379883,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,12,20027,False,0.003488779067993164,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,13,98888,False,0.004160404205322266,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,14,5069,False,0.003561258316040039,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,15,62179,False,0.004577159881591797,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,16,19037,False,0.0035097599029541016,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,17,66815,False,0.004435539245605469,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,18,12271,False,0.004277706146240234,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,19,2724,False,0.0038406848907470703,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,20,95014,False,0.003484487533569336,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,21,77856,False,0.004015684127807617,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,22,1907,False,0.003464937210083008,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,23,88516,False,0.004286527633666992,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,24,73322,False,0.004575014114379883,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,25,65444,False,0.004248857498168945,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,26,29443,False,0.0043506622314453125,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,27,66068,False,0.004614591598510742,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,28,45100,False,0.003618001937866211,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,29,71253,False,0.004193544387817383,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,30,42470,False,0.003635406494140625,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,31,79655,False,0.005080461502075195,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,32,62533,False,0.0037856101989746094,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,33,85706,False,0.004051923751831055,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,34,75574,False,0.004893779754638672,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,35,11461,False,0.005760669708251953,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,36,11459,False,0.0039560794830322266,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,37,80118,False,0.003919839859008789,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,38,77022,False,0.0054662227630615234,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,39,70371,False,0.003894805908203125,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,40,69717,False,0.004560232162475586,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,41,26522,False,0.004490375518798828,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,42,41610,False,0.006124258041381836,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,43,99000,False,0.0042078495025634766,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,44,71031,False,0.0036890506744384766,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,45,10603,False,0.0044209957122802734,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,46,85953,False,0.004281282424926758,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,47,96020,False,0.0049130916595458984,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,48,27825,False,0.0035104751586914062,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,49,58683,False,0.0962677001953125,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,5,50,56823,False,0.01575160026550293,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+classic,6,1,65560,True,0.0130462646484375,23,92,8,
+classic,6,2,78626,True,0.0041656494140625,16,55,0,
+classic,6,3,17571,True,0.004907131195068359,21,88,0,
+classic,6,4,41592,True,0.007028818130493164,19,84,4,
+classic,6,5,65954,True,0.00549006462097168,23,62,0,
+classic,6,6,49396,True,0.014368534088134766,22,92,14,
+classic,6,7,12432,True,0.0037276744842529297,17,54,0,
+classic,6,8,18042,True,0.016883134841918945,23,92,22,
+classic,6,9,5216,True,0.005820274353027344,16,72,6,
+classic,6,10,91505,True,0.0034096240997314453,25,73,0,
+classic,6,11,34374,True,0.008299589157104492,28,84,8,
+classic,6,12,82201,True,0.0067899227142333984,27,66,2,
+classic,6,13,42112,True,0.004635810852050781,27,67,0,
+classic,6,14,56786,True,0.015947341918945312,23,88,14,
+classic,6,15,53097,False,5.00271201133728,-1,-1,2014,timeout
+classic,6,16,43133,True,0.009271383285522461,26,84,0,
+classic,6,17,80191,True,0.0034074783325195312,14,43,0,
+classic,6,18,73986,True,0.025762557983398438,22,78,40,
+classic,6,19,50798,True,0.015782594680786133,21,87,17,
+classic,6,20,5626,True,0.015578746795654297,34,109,16,
+classic,6,21,66065,False,5.0033814907073975,-1,-1,1982,timeout
+classic,6,22,72429,True,0.012632369995117188,19,98,16,
+classic,6,23,85863,True,0.008746862411499023,24,76,4,
+classic,6,24,65495,False,5.009140491485596,-1,-1,2692,timeout
+classic,6,25,55684,True,0.007144451141357422,26,84,0,
+classic,6,26,19760,False,5.008669853210449,-1,-1,3818,timeout
+classic,6,27,59659,True,0.004083871841430664,15,56,0,
+classic,6,28,7084,True,0.005460262298583984,15,68,0,
+classic,6,29,6026,True,0.018883943557739258,25,73,8,
+classic,6,30,8423,True,0.004273653030395508,24,90,0,
+classic,6,31,11278,True,0.013425588607788086,23,70,18,
+classic,6,32,96231,True,0.010106086730957031,25,85,4,
+classic,6,33,57369,False,5.005937099456787,-1,-1,2076,timeout
+classic,6,34,92318,True,0.005212068557739258,21,70,0,
+classic,6,35,89902,True,0.004953861236572266,25,87,4,
+classic,6,36,48641,True,0.006253242492675781,26,110,0,
+classic,6,37,90577,True,0.003914833068847656,24,76,0,
+classic,6,38,17170,False,5.006537199020386,-1,-1,1612,timeout
+classic,6,39,71812,True,0.003652811050415039,15,54,0,
+classic,6,40,49981,True,0.01598525047302246,20,82,24,
+classic,6,41,69433,True,0.01236414909362793,30,76,6,
+classic,6,42,79096,True,0.0031321048736572266,16,65,0,
+classic,6,43,12982,True,0.004364013671875,15,56,4,
+classic,6,44,17483,True,0.00725102424621582,25,87,8,
+classic,6,45,87526,True,0.005556583404541016,31,85,2,
+classic,6,46,52582,True,0.014795541763305664,25,101,26,
+classic,6,47,82022,True,0.00423431396484375,25,69,0,
+classic,6,48,34344,True,0.0049784183502197266,16,68,2,
+classic,6,49,92039,False,5.002542734146118,-1,-1,2254,timeout
+classic,6,50,87894,True,0.009783506393432617,25,86,12,
+ours,6,1,57321,False,0.0031638145446777344,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,2,62686,False,0.002862691879272461,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,3,37555,False,0.0037147998809814453,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,4,92263,False,0.0037093162536621094,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,5,48468,False,0.003684520721435547,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,6,57817,False,0.0037102699279785156,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,7,18877,False,0.003941774368286133,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,8,66332,False,0.0032193660736083984,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,9,93175,False,0.003930568695068359,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,10,64308,False,0.0029535293579101562,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,11,14509,False,0.0037508010864257812,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,12,41293,False,0.003115415573120117,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,13,8436,False,0.003844022750854492,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,14,65488,False,0.003120899200439453,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,15,45466,False,0.0034933090209960938,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,16,87659,False,0.003052234649658203,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,17,87078,False,0.0059168338775634766,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,18,68152,False,0.0046634674072265625,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,19,87195,False,0.003909587860107422,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,20,32847,False,0.0032732486724853516,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,21,54165,False,0.0034232139587402344,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,22,99552,False,0.0034880638122558594,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,23,26441,False,0.003931760787963867,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,24,95634,False,0.004160881042480469,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,25,63958,False,0.00624847412109375,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,26,54752,False,0.011819839477539062,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,27,54094,False,0.010027647018432617,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,28,93807,False,0.009128570556640625,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,29,69822,False,0.009860754013061523,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,30,8991,False,0.00774693489074707,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,31,82146,False,0.00860595703125,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,32,68745,False,0.0094146728515625,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,33,7511,False,0.011152982711791992,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,34,23784,False,0.01254582405090332,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,35,73739,False,0.005053997039794922,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,36,12446,False,0.0046732425689697266,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,37,23102,False,0.004127025604248047,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,38,4716,False,0.003792285919189453,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,39,66839,False,0.0060863494873046875,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,40,54540,False,0.01090860366821289,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,41,12183,False,0.011140823364257812,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,42,75591,False,0.010112762451171875,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,43,81324,False,0.048761606216430664,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,44,15701,False,0.011411428451538086,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,45,85323,False,0.007233858108520508,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,46,27366,False,0.0060307979583740234,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,47,60730,False,0.006601810455322266,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,48,23078,False,0.005121946334838867,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,49,82297,False,0.005893230438232422,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,6,50,18032,False,0.006146430969238281,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+classic,7,1,12835,True,0.0138397216796875,21,105,6,
+classic,7,2,47458,True,0.014670372009277344,25,92,16,
+classic,7,3,60117,True,0.00796818733215332,28,82,6,
+classic,7,4,25654,True,0.005483388900756836,24,102,0,
+classic,7,5,48321,True,0.021330833435058594,42,126,10,
+classic,7,6,34081,True,0.017804622650146484,19,89,18,
+classic,7,7,70560,True,0.007754325866699219,22,87,4,
+classic,7,8,22117,True,0.006463766098022461,25,104,0,
+classic,7,9,18523,True,0.006131410598754883,22,82,0,
+classic,7,10,95075,True,0.494304895401001,24,96,276,
+classic,7,11,42251,True,0.011877298355102539,22,106,6,
+classic,7,12,42926,True,0.03351235389709473,19,101,52,
+classic,7,13,43710,True,0.006405830383300781,21,77,2,
+classic,7,14,23386,True,0.017070770263671875,21,94,12,
+classic,7,15,31577,True,0.003912448883056641,15,68,0,
+classic,7,16,22505,True,0.007013559341430664,26,100,2,
+classic,7,17,13058,True,0.009532451629638672,22,103,10,
+classic,7,18,87473,True,0.11564111709594727,24,79,162,
+classic,7,19,7110,True,0.0076694488525390625,23,98,2,
+classic,7,20,75259,True,0.008897781372070312,16,61,10,
+classic,7,21,22096,True,0.013208866119384766,29,111,10,
+classic,7,22,6281,True,0.006755828857421875,27,120,2,
+classic,7,23,36234,True,0.006000518798828125,28,107,0,
+classic,7,24,11757,True,0.006679534912109375,24,105,4,
+classic,7,25,77821,True,0.005721569061279297,22,92,2,
+classic,7,26,82964,False,5.003581285476685,-1,-1,3510,timeout
+classic,7,27,98984,True,0.03200340270996094,22,107,20,
+classic,7,28,60863,True,0.008771181106567383,21,96,2,
+classic,7,29,42214,True,0.009121179580688477,20,82,8,
+classic,7,30,3189,True,0.016004323959350586,19,64,22,
+classic,7,31,98679,True,0.011263847351074219,29,124,0,
+classic,7,32,85456,True,0.007393360137939453,19,72,4,
+classic,7,33,85540,False,5.004381895065308,-1,-1,6904,timeout
+classic,7,34,21897,True,0.008292913436889648,26,88,6,
+classic,7,35,97285,True,0.010657548904418945,21,106,6,
+classic,7,36,98426,False,5.007277011871338,-1,-1,2416,timeout
+classic,7,37,39483,True,0.041517019271850586,32,126,44,
+classic,7,38,7632,True,0.004431009292602539,20,75,0,
+classic,7,39,85560,False,5.022566795349121,-1,-1,3774,timeout
+classic,7,40,89982,True,0.02496051788330078,26,91,6,
+classic,7,41,71600,True,0.005220651626586914,12,52,0,
+classic,7,42,12157,True,0.008148193359375,24,120,0,
+classic,7,43,87690,True,0.010335922241210938,26,105,2,
+classic,7,44,45345,True,0.007075309753417969,27,92,2,
+classic,7,45,66718,True,0.010018587112426758,25,86,9,
+classic,7,46,28594,True,0.007934331893920898,28,113,2,
+classic,7,47,34327,True,0.0069010257720947266,26,134,0,
+classic,7,48,37472,True,0.012011528015136719,22,97,6,
+classic,7,49,10173,True,0.0072629451751708984,24,102,4,
+classic,7,50,9751,True,0.00702357292175293,22,99,6,
+ours,7,1,96008,False,0.0037262439727783203,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,2,93449,False,0.004275083541870117,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,3,34020,False,0.005081892013549805,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,4,21568,False,0.0043637752532958984,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,5,3119,False,0.004468202590942383,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,6,70463,False,0.004303932189941406,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,7,55856,False,0.004702091217041016,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,8,81566,False,0.0035545825958251953,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,9,88156,False,0.005489826202392578,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,10,29375,False,0.0039026737213134766,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,11,23229,False,0.004422426223754883,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,12,62867,False,0.004456043243408203,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,13,67823,False,0.004630088806152344,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,14,10240,False,0.004062652587890625,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,15,19855,False,0.003940582275390625,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,16,54915,False,0.004386186599731445,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,17,13793,False,0.023235797882080078,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,18,36986,False,0.004004240036010742,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,19,2263,False,0.005627632141113281,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,20,64766,False,0.004110097885131836,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,21,25049,False,0.004431247711181641,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,22,3883,False,0.0036439895629882812,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,23,47218,False,0.0043182373046875,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,24,15649,False,0.005182504653930664,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,25,46737,False,0.003972768783569336,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,26,97713,False,0.005140066146850586,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,27,13831,False,0.00447845458984375,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,28,86201,False,0.004107475280761719,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,29,93687,False,0.0050182342529296875,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,30,67490,False,0.00472712516784668,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,31,92013,False,0.00498199462890625,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,32,70731,False,0.005036592483520508,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,33,96285,False,0.004285335540771484,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,34,50332,False,0.004300117492675781,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,35,89875,False,0.003610372543334961,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,36,21159,False,0.003823518753051758,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,37,24001,False,0.0897221565246582,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,38,18532,False,0.016635417938232422,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,39,2908,False,0.008941173553466797,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,40,66899,False,0.007183074951171875,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,41,67005,False,0.004900932312011719,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,42,34140,False,0.004746437072753906,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,43,21666,False,0.00601506233215332,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,44,54610,False,0.005477428436279297,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,45,1128,False,0.006917715072631836,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,46,72360,False,0.006267547607421875,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,47,82510,False,0.0055849552154541016,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,48,67231,False,0.008089303970336914,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,49,4836,False,0.006990909576416016,-1,-1,0,PassableGraph for category 0 missing width/height attributes.
+ours,7,50,42889,False,0.004571437835693359,-1,-1,0,PassableGraph for category 0 missing width/height attributes.

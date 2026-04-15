@@ -1,0 +1,61 @@
+alg,seed,success,time,makespan,nodes,error
+hcbs,77295,False,0.005949974060058594,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,59641,False,0.004533290863037109,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,16563,False,0.003786802291870117,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,11903,False,0.005466938018798828,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,33925,False,0.003972768783569336,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,57490,False,0.006629228591918945,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,72668,False,0.004006147384643555,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,43844,False,0.004556179046630859,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,28089,False,0.0037882328033447266,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,9359,False,0.004104137420654297,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,84712,False,0.0044591426849365234,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,17458,False,0.0067827701568603516,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,71859,False,0.004161834716796875,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,61870,False,0.0050449371337890625,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,47458,False,0.004220247268676758,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,80772,False,0.005370378494262695,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,26526,False,0.0036706924438476562,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,41348,False,0.005016803741455078,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,28169,False,0.004039287567138672,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,74773,False,0.0039021968841552734,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,20844,False,0.004584312438964844,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,46956,False,0.0037360191345214844,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,89938,False,0.003779888153076172,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,869,False,0.0043256282806396484,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,38532,False,0.004076719284057617,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,60836,False,0.004204273223876953,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,67772,False,0.00404667854309082,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,39997,False,0.004321098327636719,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,35418,False,0.003391742706298828,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+hcbs,25156,False,0.005227088928222656,-1,0,HCBSBase.search() got an unexpected keyword argument 'interactive'
+ours,67927,False,0.02252936363220215,-1,0,
+ours,62791,False,0.023556232452392578,-1,0,
+ours,94943,True,0.011913537979125977,20,0,
+ours,57134,False,0.043639421463012695,-1,0,
+ours,98777,True,0.09322905540466309,26,6,
+ours,66633,False,5.020120859146118,-1,195,
+ours,90181,True,0.04578065872192383,26,0,
+ours,82420,True,3.711246967315674,31,159,
+ours,81041,True,0.026407241821289062,16,2,
+ours,11928,False,0.04032015800476074,-1,0,
+ours,40019,True,2.538102626800537,35,79,
+ours,10030,False,0.07430338859558105,-1,2,
+ours,27505,False,0.06697821617126465,-1,0,
+ours,73191,True,0.17090463638305664,23,16,
+ours,98099,False,0.24033260345458984,-1,3,
+ours,90638,True,0.10012102127075195,28,2,
+ours,17248,True,0.40144824981689453,36,6,
+ours,95363,False,0.11808252334594727,-1,4,
+ours,66270,False,0.4273834228515625,-1,14,
+ours,50069,False,3.847214698791504,-1,371,
+ours,18408,False,0.016732454299926758,-1,0,
+ours,85795,True,0.03102707862854004,21,0,
+ours,19539,False,4.873107671737671,-1,301,
+ours,54213,False,3.27608060836792,-1,162,
+ours,4057,True,0.023838043212890625,19,0,
+ours,85254,False,0.1715855598449707,-1,16,
+ours,59044,True,0.017495393753051758,23,0,
+ours,27377,True,0.5685081481933594,35,46,
+ours,28574,False,0.016858816146850586,-1,0,
+ours,21794,True,4.47529673576355,36,270,

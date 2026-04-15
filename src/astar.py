@@ -16,8 +16,8 @@ def astar(agent_instance: AgentInstance,
           reservation_table: ReservationTable,
           cr: List[List[int]],
           weight_cr: float = 0.1,
-          weight_bridge: float = 10.0,
-          weight_res: float = 1.0,
+          weight_bridge: float = 0.3,
+          weight_res: float = 0.4,
           constraints: List[Tuple[int, Tuple[int, int]]] = None,
           wait_cost: float = 1.0 ) -> Optional[List[Tuple[int, int]]]:
     """
@@ -69,23 +69,23 @@ def astar(agent_instance: AgentInstance,
         if t in constraint_dict and pos in constraint_dict[t]:
             return float('inf')  # 不可行状态
         cells = get_occupied_cells(pos)
-        total = 0.0
+
+        # 分别累计三项惩罚并加权求和，限制总软约束惩罚小于1
+        sum_cr = 0.0
+        sum_bridge = 0.0
+        sum_res = 0.0
+    
         for cx, cy in cells:
-            # 拥堵系数
-            total += weight_cr * cr[cx][cy]
-            # 桥栅格
-            """
-            桥栅格惩罚是否太高？一个图中必然存在多类智能体的桥栅格，但是真的有必要每次经过桥栅格都做惩罚吗？
-            可不可以同步完成冲突检测，如果确定同一时间步确实占用了某个智能体的桥栅格再惩罚？
-            每步的代价才设为1，桥自己的代价就是10，太高了
-            在桥栅格没有发挥桥作用，而只是作为普通栅格存在的情况下，真的需要让其他智能体避让它吗？
-            """
+            sum_cr += cr[cx][cy]
             if (cx, cy) in passable_graph.bridges:
-                total += weight_bridge
-            # 预约表占用
+                sum_bridge += 1
             info = reservation_table.query(cx, cy, t)
-            total += weight_res * info['count']
-        return total
+            sum_res += info['count']
+    
+        penalty = (weight_cr * sum_cr) + (weight_bridge * sum_bridge) + (weight_res * sum_res)
+        penalty = min(penalty, 0.999)  # 确保小于移动一步的代价1
+    
+        return penalty
 
     # 启发函数（曼哈顿距离）
     def heuristic(pos: Tuple[int, int]) -> int:
@@ -156,4 +156,74 @@ def astar(agent_instance: AgentInstance,
                 heapq.heappush(open_set, (f_val, ng, nt, pos))
                 came_from[state] = ((pos, t), True)  # True代表在原地等待
 
+    return None
+
+
+"""
+经典A*无软约束版
+"""
+def astar_classic(agent_instance, grid_map, constraints=None):
+    """
+    经典CBS低层A*：质点模型，1×1尺寸，仅遵守硬约束
+    """
+    start = agent_instance.start
+    goal = agent_instance.goal
+    if constraints is None:
+        constraints = []
+    # 构建硬约束字典
+    constraint_dict = {}
+    for t, pos in constraints:
+        if t not in constraint_dict:
+            constraint_dict[t] = set()
+        constraint_dict[t].add(pos)
+
+    def heuristic(pos):
+        return abs(pos[0] - goal[0]) + abs(pos[1] - goal[1])
+
+    def get_neighbors(pos):
+        x, y = pos
+        candidates = [(x, y-1), (x, y+1), (x-1, y), (x+1, y)]
+        return [p for p in candidates if grid_map.is_passable(p[0], p[1])]
+
+    open_set = []
+    t0 = 0
+    if t0 in constraint_dict and start in constraint_dict[t0]:
+        return None
+    heapq.heappush(open_set, (heuristic(start), 0, t0, start))
+    g_score = {(start, t0): 0}
+    came_from = {}
+
+    while open_set:
+        f, g, t, pos = heapq.heappop(open_set)
+        if pos == goal:
+            # 重建路径
+            path = []
+            state = (pos, t)
+            while state in came_from:
+                path.append(state[0])
+                state = came_from[state]
+            path.append(start)
+            path.reverse()
+            return path
+        if g > g_score.get((pos, t), float('inf')):
+            continue
+        nt = t + 1
+        # 移动
+        for nbr in get_neighbors(pos):
+            if nt in constraint_dict and nbr in constraint_dict[nt]:
+                continue
+            ng = g + 1
+            state = (nbr, nt)
+            if ng < g_score.get(state, float('inf')):
+                g_score[state] = ng
+                heapq.heappush(open_set, (ng + heuristic(nbr), ng, nt, nbr))
+                came_from[state] = (pos, t)
+        # 等待
+        if nt not in constraint_dict or pos not in constraint_dict[nt]:
+            ng = g + 1
+            state = (pos, nt)
+            if ng < g_score.get(state, float('inf')):
+                g_score[state] = ng
+                heapq.heappush(open_set, (ng + heuristic(pos), ng, nt, pos))
+                came_from[state] = (pos, t)
     return None

@@ -9,9 +9,6 @@ import numpy as np
 from datetime import datetime
 import matplotlib
 
-# ==========================================================
-# 🛠️ 关键修复：Matplotlib 中文字体配置
-# ==========================================================
 def setup_chinese_font():
     """
     自动检测并设置中文字体，解决图表中文显示为方块或空白的问题
@@ -67,7 +64,13 @@ except ImportError as e:
 # ==========================================================
 # ⚙️ 配置区域
 # ==========================================================
-OUTPUT_DIR = "batch_heterogeneity_analysis"
+# 生成时间戳文件夹名，格式：YYYYMMDD_HHMMSS
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+# 根输出目录：../test/时间戳/
+BASE_OUTPUT_DIR = os.path.join("..", "test", timestamp)
+os.makedirs(BASE_OUTPUT_DIR, exist_ok=True)
+
+OUTPUT_DIR = BASE_OUTPUT_DIR
 LOG_DIR = os.path.join(OUTPUT_DIR, "logs")
 IMG_DIR = os.path.join(OUTPUT_DIR, "images", "paths")
 SUMMARY_IMG = os.path.join(OUTPUT_DIR, "images", "comparison_analysis.png")
@@ -108,7 +111,7 @@ EXPERIMENT_SCENARIOS = [
 ]
 
 AGENT_COUNTS = list(range(4, 11)) 
-REPEAT_TIMES = 20 
+REPEAT_TIMES = 50 
 TIME_LIMIT_PER_RUN = 5.0
 MAX_CBS_NODES = 3000
 MAX_ATTEMPTS_PER_AGENT = 1500
