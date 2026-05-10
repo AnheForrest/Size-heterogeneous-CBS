@@ -20,18 +20,18 @@ def compute_cr(grid_map: GridMap,
     :return: 二维列表 cr[x][y]，表示坐标 (x, y) 的拥堵系数
     """
     cols, rows = grid_map.cols, grid_map.rows
-    # 初始化 cr
+    #初始化 cr
     cr = [[0 for _ in range(rows)] for _ in range(cols)]
 
     for cat, pg in passable_graphs.items():
-        # 确保 pg 有 width 和 height 属性
+        #确保 pg 有 width 和 height 属性
         if not hasattr(pg, 'width') or not hasattr(pg, 'height'):
             raise AttributeError(f"PassableGraph for category {cat} missing width/height attributes.")
         w, h = pg.width, pg.height
 
-        # 遍历该类所有合法左上角位置
+        #遍历该类所有合法左上角位置
         for (x, y) in pg.V:
-            # 该位置覆盖的所有栅格
+            #该位置覆盖的所有栅格
             for dx in range(w):
                 for dy in range(h):
                     cx = x + dx
@@ -40,7 +40,7 @@ def compute_cr(grid_map: GridMap,
                     if 0 <= cx < cols and 0 <= cy < rows:
                         cr[cx][cy] += 1
                     else:
-                        # 若越界则忽略
+                        #若越界则忽略
                         pass
 
     return cr

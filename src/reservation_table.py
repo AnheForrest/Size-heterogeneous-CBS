@@ -105,7 +105,7 @@ class ReservationTable:
                  其中 pos_a_t 为智能体 a 在 t 时刻的左上角坐标，pos_a_t1 为 t+1 时刻的坐标。
                  冲突是对称的，只记录一对。
         """
-        # 为每个智能体预先计算每个时间步的占据栅格集合，避免重复计算
+        #为每个智能体预先计算每个时间步的占据栅格集合，避免重复计算
         agent_occupancy = {}  # agent_id -> {t: set_of_cells}
         for agent in agents:
             if agent.path is None:
@@ -116,7 +116,7 @@ class ReservationTable:
             agent_occupancy[agent.global_id] = occ  # 使用 global_id
 
         edge_conflicts = []
-        # 遍历所有智能体对
+        #遍历所有智能体对
         agent_ids = list(agent_occupancy.keys())
         for i in range(len(agent_ids)):
             aid = agent_ids[i]
@@ -134,7 +134,7 @@ class ReservationTable:
                 path_b = b.path
                 if path_a is None or path_b is None:
                     continue
-                # 遍历可能发生交换的时间步
+                #遍历可能发生交换的时间步
                 max_t = min(len(path_a), len(path_b)) - 1
                 for t in range(max_t):  # t 从 0 到 max_t-1
                     if t+1 in occ_a and t in occ_b and t+1 in occ_b:

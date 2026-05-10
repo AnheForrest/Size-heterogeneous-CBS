@@ -155,7 +155,7 @@ def retry_failed_tasks(failed_requests: List[Tuple[int, int]],
             goal_cells = set(cls.get_occupied_cells(goal))
             if (start_cells | goal_cells) & occupied_all:
                 continue
-            # 成功
+            #成功
             agent = AgentInstance(
                 agent_class=cls,
                 instance_id=instance_id,
@@ -173,7 +173,6 @@ def retry_failed_tasks(failed_requests: List[Tuple[int, int]],
         if not success:
             print(f"警告：类别 {cat} 的第 {instance_id} 个智能体在重试 {max_attempts} 次后仍无法生成无冲突任务，已永久跳过")
 
-    # 更新原始 existing_occupied 集合（通过传入的可变集合直接修改）
     existing_occupied.update(occupied_all - set(existing_occupied))
 
     return new_tasks

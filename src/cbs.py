@@ -34,8 +34,8 @@ class CBSNode:
         self.total_cost = 0
         self.conflict_count = 0  # 当前节点的冲突数量
         if paths:
-            # makespan = 最大路径长度-1 (总时间步)
-            # total_cost = 各智能体移动步数之和 (移动指位置变化，等待不计)
+            #makespan = 路径中最长的时间步数
+            #total_cost = 各智能体移动步数之和 (移动指位置变化，等待不计)
             max_len = 0
             total_moves = 0
             for path in paths.values():
@@ -44,7 +44,7 @@ class CBSNode:
                 steps = len(path) - 1
                 if steps > max_len:
                     max_len = steps
-                # 修正：移动次数统计 - 统计连续不同位置的数量
+
                 moves = 0
                 for i in range(1, len(path)):
                     if path[i] != path[i-1]:
@@ -64,7 +64,7 @@ class CBSNode:
         if agent_id not in new_constraints:
             new_constraints[agent_id] = []
         new_constraints[agent_id].append(constraint)
-        # 新节点路径为空，metrics 暂为 0，待重规划后更新
+
         return CBSNode(new_constraints, {}, parent=self)
 
 
@@ -77,7 +77,7 @@ class CBS:
                  cr: List[List[int]]):
         """
         :param agents: 智能体实例列表
-        :param passable_graphs: 类别 -> 可通行子图
+        :param passable_graphs: 类别对应的可通行子图
         :param reservation_table: 全局预约表（用于软约束和桥信息）
         :param cr: 拥堵系数矩阵
         """
@@ -86,16 +86,16 @@ class CBS:
         self.passable_graphs = passable_graphs
         self.res_table = reservation_table
         self.cr = cr
-        self.open_set = []          # 优先队列，元素 (makespan, total_cost, conflict_count, node_id, node)
+        self.open_set = []          #优先队列，元素 (makespan, total_cost, conflict_count, node_id, node)
         self.best_makespan = float('inf')
         self.best_total_cost = float('inf')
         self.best_node = None
-        self.expanded_signatures = set()   # 记录已扩展节点的签名，避免重复
-        self.conflict_tries = {}          # 记录每个冲突的尝试组合，避免重复尝试
-        self.max_tries_per_conflict = 10  # 每个冲突最多尝试的不同组合数
+        self.expanded_signatures = set()   #记录已扩展节点的签名，避免重复
+        self.conflict_tries = {}          #记录每个冲突的尝试组合，避免重复尝试
+        self.max_tries_per_conflict = 10  #每个冲突最多尝试的不同组合数
 
     def _compute_metrics(self, paths: Dict[int, List]) -> Tuple[float, float]:
-        """计算路径的 makespan 和 total_cost"""
+        """计算路径的makespan和total_cost"""
         max_len = 0
         total_moves = 0
         for path in paths.values():
@@ -104,7 +104,7 @@ class CBS:
             steps = len(path) - 1
             if steps > max_len:
                 max_len = steps
-            # 修正：移动次数统计
+
             moves = 0
             for i in range(1, len(path)):
                 if path[i] != path[i-1]:
@@ -117,7 +117,7 @@ class CBS:
         """为单个智能体重规划，考虑硬约束"""
         agent = self.agent_dict[agent_id]
         pg = self.passable_graphs[agent.agent_class.category]
-        # 调用 A*，传入该智能体的约束列表
+        #调用 A*，传入该智能体的约束列表
         path = astar(
             agent_instance=agent,
             passable_graph=pg,
@@ -135,7 +135,7 @@ class CBS:
         根据冲突生成子节点。
         1. 对于顶点冲突，首先生成单约束子节点（每个智能体单独禁止），
         2. 跟踪冲突尝试过的约束组合，避免重复
-        3. 如果该冲突被选择的次数超过阈值（3次），则尝试生成一个同时禁止所有智能体的双约束子节点。
+        3. 如果该冲突被选择的次数超过阈值，则尝试生成一个同时禁止所有智能体的双约束子节点。
         4. 只对未到达终点的智能体添加约束
         :param node: 当前节点
         :param conflict: 冲突字典，包含 type, time, pos, agents
@@ -146,7 +146,7 @@ class CBS:
         t = conflict['time']
         agents_ids = conflict['agents']
 
-        # 检查是否是终点冲突，如果是，则只考虑未到达终点的智能体
+        #检查是否是终点冲突，如果是，则只考虑未到达终点的智能体
         active_agents = []
         for aid in agents_ids:
             agent = self.agent_dict[aid]
@@ -156,11 +156,11 @@ class CBS:
             elif path and t < len(path):  # 到达终点，但仍可能参与冲突
                 active_agents.append(aid)
         
-        # 如果没有活跃智能体，跳过
+        #如果没有活跃智能体，跳过
         if not active_agents:
             return children
 
-        # 记录冲突尝试
+        #记录冲突尝试
         conflict_key = (ctype, t, conflict['pos'], tuple(sorted(agents_ids)))
         if conflict_key not in self.conflict_tries:
             self.conflict_tries[conflict_key] = []
@@ -169,10 +169,10 @@ class CBS:
         
         if ctype == 'vertex':
             pos = conflict['pos']
-            # 生成单约束子节点（仅对活跃智能体）
+            #生成单约束子节点（仅对活跃智能体）
             for aid in active_agents:
                 constraint = (t, pos)
-                # 检查是否已经尝试过这种约束
+                #检查是否已经尝试过这种约束
                 constraint_combo = frozenset([(aid, constraint)])
                 if constraint_combo in tried_combinations:
                     continue
@@ -201,7 +201,7 @@ class CBS:
             # 如果冲突尝试次数过多，尝试双约束
             if len(tried_combinations) >= 3 and len(active_agents) > 1:
                 print(f"        冲突已被选择多次，尝试生成双约束子节点")
-                # 尝试禁止两个活跃智能体的组合
+                #尝试禁止两个活跃智能体的组合
                 for i in range(len(active_agents)):
                     for j in range(i+1, len(active_agents)):
                         aid1, aid2 = active_agents[i], active_agents[j]
@@ -216,7 +216,7 @@ class CBS:
                         double_node = double_node.apply_constraint(aid1, constraint1)
                         double_node = double_node.apply_constraint(aid2, constraint2)
                         
-                        # 重规划两个智能体
+                        #重规划两个智能体
                         new_paths = node.paths.copy()
                         success = True
                         for aid in [aid1, aid2]:
@@ -234,8 +234,8 @@ class CBS:
                             print(f"        双约束子节点生成成功，makespan={double_node.makespan}, total_cost={double_node.total_cost}，冲突数 {double_node.conflict_count}")
                             
                             tried_combinations.append(constraint_combo)
-                            break  # 成功后跳出，避免生成过多双约束节点
-                    if len([c for c in tried_combinations if len(c) == 2]) > 0:  # 已生成双约束
+                            break  #成功后跳出，避免生成过多双约束节点
+                    if len([c for c in tried_combinations if len(c) == 2]) > 0:  #已生成双约束
                         break
 
         elif ctype == 'edge':
@@ -249,7 +249,7 @@ class CBS:
             pos_a_t = a_path[t]
             pos_b_t = b_path[t]
 
-            # 子节点1：禁止 a 在 t 时刻位于 pos_a_t
+            #子节点1：禁止 a 在 t 时刻位于 pos_a_t
             constraint_a = (t, pos_a_t)
             constraint_combo_a = frozenset([(aid, constraint_a)])
             if constraint_combo_a not in tried_combinations:
@@ -269,7 +269,7 @@ class CBS:
                 else:
                     print(f"        重规划失败")
 
-            # 子节点2：禁止 b 在 t 时刻位于 pos_b_t
+            #子节点2：禁止 b 在 t 时刻位于 pos_b_t
             constraint_b = (t, pos_b_t)
             constraint_combo_b = frozenset([(bid, constraint_b)])
             if constraint_combo_b not in tried_combinations:
@@ -293,7 +293,7 @@ class CBS:
 
     def _compute_conflict_count(self, node: CBSNode) -> int:
         """计算给定节点的路径集中的冲突数量"""
-        # 先补齐路径至最大时间
+        #先补齐路径至最大时间
         if not node.paths:
             return 0
         max_len = max(len(p) for p in node.paths.values())
@@ -356,18 +356,18 @@ class CBS:
                 return None
             root_paths[agent.global_id] = path
         root_node = CBSNode(root_constraints, root_paths)
-        # 计算根节点的冲突数
+        #计算根节点的冲突数
         root_node.conflict_count = self._compute_conflict_count(root_node)
 
-        # 优先队列元素：(makespan, total_cost, conflict_count, node_id, node)
+        #优先队列元素：(makespan, total_cost, conflict_count, node_id, node)
         heapq.heappush(self.open_set, (root_node.makespan, root_node.total_cost, root_node.conflict_count, id(root_node), root_node))
 
         iteration = 0
-        MAX_ITER = 1000  # 增加最大迭代次数，防止过早终止
+        MAX_ITER = 1000  #增加最大迭代次数，防止过早终止
         while self.open_set:
             if time.time() - start_time > getattr(self, 'time_limit', 60.0):
                 print(f"[CBS] 超时 ({getattr(self, 'time_limit', 60.0)}s)，终止搜索。")
-                # 统一返回格式：(Success, Paths, Stats)
+                #统一返回格式：(Success, Paths, Stats)
                 return False, None, {
                     'nodes_expanded': len(self.expanded_signatures), 
                     'reason': 'timeout',
@@ -440,13 +440,13 @@ class CBS:
                 }
                 return True, node.paths, stats
 
-            # 计算冲突严重程度并排序
+            #计算冲突严重程度并排序
             priority_func = lambda a: a.agent_class.width + a.agent_class.height
             for c in conflicts:
                 c['severity'] = assign_severity(c, self.agents, priority_func)
             sorted_conflicts = sort_conflicts(conflicts)
 
-            # 选择冲突：优先选择未被尝试过或尝试次数较少的冲突
+            #选择冲突：优先选择未被尝试过或尝试次数较少的冲突
             chosen_conflict = None
             for c in sorted_conflicts:
                 # 生成冲突唯一标识
@@ -456,13 +456,13 @@ class CBS:
                     chosen_conflict = c
                     break
             if chosen_conflict is None:
-                # 如果所有冲突都尝试过了，选择第一个
+                #如果所有冲突都尝试过了，选择第一个
                 chosen_conflict = sorted_conflicts[0]
 
             print(f"选择冲突: 类型={chosen_conflict['type']}, 时间={chosen_conflict['time']}, "
                   f"位置={chosen_conflict['pos']}, 智能体={chosen_conflict['agents']}, severity={chosen_conflict['severity']:.2f}")
 
-            # 扩展子节点
+            #扩展子节点
             children = self.expand_node(node, chosen_conflict)
             print(f"生成 {len(children)} 个子节点")
             for child in children:
@@ -470,13 +470,13 @@ class CBS:
                 if self.is_pruned(child):
                     print(f"  子节点被代价剪枝 (makespan={child.makespan}, total_cost={child.total_cost})")
                     continue
-                # 签名去重：将约束集转换为可哈希的字符串
+                #签名去重：将约束集转换为可哈希的字符串
                 sig = str(sorted((aid, sorted(con_list)) for aid, con_list in child.constraints.items()))
                 if sig in self.expanded_signatures:
                     print(f"  子节点签名重复，跳过")
                     continue
                 self.expanded_signatures.add(sig)
-                # 加入开放集，使用 (makespan, total_cost, conflict_count, id, node)
+                #加入开放集，使用 (makespan, total_cost, conflict_count, id, node)
                 heapq.heappush(self.open_set,
                                (child.makespan, child.total_cost, child.conflict_count, id(child), child))
                 print(f"  子节点加入开放集: makespan={child.makespan}, total_cost={child.total_cost}, conflict_count={child.conflict_count}")

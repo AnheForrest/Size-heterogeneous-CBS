@@ -1,5 +1,5 @@
 """
-主控脚本：交互式输入参数，测试多智能体路径规划（支持冲突解决）
+主控脚本
 """
 
 import sys
@@ -21,9 +21,9 @@ from astar import astar
 from cbs import CBS
 from visualization import draw_map, draw_agents, draw_path, animate_solution
 
-
+"""------------------------0.交互输入参数------------------------"""
+#0.1.获取正整数输入
 def get_positive_int(prompt, default=None):
-    """获取正整数输入"""
     while True:
         val = input(prompt)
         if not val and default is not None:
@@ -37,8 +37,8 @@ def get_positive_int(prompt, default=None):
         except ValueError:
             print("请输入整数。")
 
+#0.2.获取指定范围内的浮点数
 def get_float_in_range(prompt, low, high, default=None):
-    """获取指定范围内的浮点数"""
     while True:
         val = input(prompt)
         if not val and default is not None:
@@ -52,8 +52,8 @@ def get_float_in_range(prompt, low, high, default=None):
         except ValueError:
             print("请输入浮点数。")
 
+#0.3.获取非负整数
 def get_non_negative_int(prompt, default=None):
-    """获取非负整数"""
     while True:
         val = input(prompt)
         if not val and default is not None:
@@ -67,8 +67,8 @@ def get_non_negative_int(prompt, default=None):
         except ValueError:
             print("请输入整数。")
 
+#0.4.获取是/否输入
 def get_yes_no(prompt, default='n'):
-    """获取是/否输入"""
     while True:
         val = input(prompt).strip().lower()
         if not val:
@@ -80,24 +80,24 @@ def get_yes_no(prompt, default='n'):
         else:
             print("请输入 y 或 n。")
 
+#0.5.生成带时间戳的输出文件名
 def generate_output_filename(prefix, extension):
-    """生成带时间戳的输出文件名"""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     return f"{prefix}_{timestamp}.{extension}"
 
 def main():
     try:
         print("=" * 50)
-        print("多智能体路径规划测试脚本（支持冲突解决）")
+        print("尺寸异构多智能体路径规划主控脚本")
         print("=" * 50)
 
-        # ==================== 交互式输入参数 ====================
+        #==================== 交互式输入参数 ====================
         print("\n请配置地图参数：")
         MAP_WIDTH = get_positive_int("地图宽度 (列数) [默认10]: ", default=10)
         MAP_HEIGHT = get_positive_int("地图高度 (行数) [默认10]: ", default=10)
         OBSTACLE_RATIO = get_float_in_range("障碍物占比 [0,1) [默认0.2]: ", 0.0, 1.0, default=0.2)
 
-        # 智能体类别配置
+        #智能体类别配置
         num_categories = get_positive_int("\n智能体类别数 [默认2]: ", default=2)
         agent_classes = []
         counts = []
@@ -110,7 +110,7 @@ def main():
             agent_classes.append(AgentClass(category=cat, width=width, height=height))
             counts.append(count)
 
-        # 汇总显示
+        #汇总显示
         print("\n" + "=" * 50)
         print("输入参数汇总：")
         print(f"地图尺寸: {MAP_WIDTH} x {MAP_HEIGHT}")
@@ -119,21 +119,21 @@ def main():
             print(f"类别 {cls.category}: 尺寸 {cls.width}x{cls.height}, 数量 {cnt}")
         print("=" * 50)
 
-        # 设置随机种子（可选）
-        seed = input("\n输入随机种子 (直接回车使用默认42): ")
+        #设置随机种子
+        seed = input("\n输入随机种子 (直接回车使用默认10): ")
         if seed:
             random.seed(int(seed))
         else:
-            random.seed(42)
+            random.seed(10)
 
-        # ==================== 1. 创建地图 ====================
+        #==================== 1. 创建地图 ====================
         print("\n[1] 创建地图...")
         grid = GridMap(MAP_WIDTH, MAP_HEIGHT)
         obstacles = grid.create_random_obstacles(OBSTACLE_RATIO)
         print(f"    地图尺寸: {grid.rows}行 x {grid.cols}列")
         print(f"    障碍物数量: {len(obstacles)}")
 
-        # ==================== 2. 构建可通行子图 ====================
+        #==================== 2. 构建可通行子图 ====================
         print("\n[2] 构建可通行子图...")
         passable_graphs = {}
         for cls in agent_classes:

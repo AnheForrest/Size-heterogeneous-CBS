@@ -29,7 +29,7 @@ def detect_conflicts(reservation_table: ReservationTable,
     """
     conflicts = []
 
-    # 1. 顶点冲突（来自预约表）
+    #1. 顶点冲突（来自预约表）
     vertex_conflicts = reservation_table.get_conflicts()  # 返回 (x, y, t, agents_set)
     for (x, y, t, agents_set) in vertex_conflicts:
         conflicts.append({
@@ -39,11 +39,9 @@ def detect_conflicts(reservation_table: ReservationTable,
             'agents': list(agents_set)   # agents_set 中包含全局ID
         })
 
-    # 2. 边冲突：基于路径信息计算
-    """
-    在预约表里已经完成了边冲突的检测了，这边重新检测一遍是什么意思？
-    """
-    # 构建每个智能体每个时间步的占用栅格集合
+    #2. 边冲突：基于路径信息计算
+   
+    #构建每个智能体每个时间步的占用栅格集合
     agent_occupancy = {}
     path_map = {}  # aid -> path list
     for agent in agents:
@@ -61,7 +59,7 @@ def detect_conflicts(reservation_table: ReservationTable,
             occ[t_idx] = set(cells)
         agent_occupancy[aid] = occ
 
-    # 遍历所有智能体对
+    #遍历所有智能体对
     ids = list(agent_occupancy.keys())
     for i in range(len(ids)):
         aid = ids[i]
@@ -107,16 +105,16 @@ def assign_severity(conflict: Dict,
     :return: 严重程度值（浮点数）
     """
     agent_ids = conflict['agents']
-    # 根据ID查找对应的智能体实例
+    #根据ID查找对应的智能体实例
     involved_agents = [a for a in agents if a.global_id in agent_ids]
     if not involved_agents:
         return 0.0
 
-    # 计算最大优先级
+    #计算最大优先级
     max_priority = max(priority_func(a) for a in involved_agents)
     severity = len(involved_agents) * max_priority
 
-    # 根据冲突类型再调整，例如边冲突稍微加权
+    #根据冲突类型再调整，例如边冲突稍微加权
     if conflict['type'] == 'edge':
         severity *= 1.2
 

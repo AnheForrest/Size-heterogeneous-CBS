@@ -1,6 +1,6 @@
 """
 A* 低层规划模块
-为单个智能体规划路径，考虑拥堵系数、桥栅格、全局预约表软约束以及CBS硬约束。
+为单个智能体规划路径，考虑拥堵系数、桥栅格、全局预约表软约束以及CBS高层下发硬约束。
 """
 
 import heapq
@@ -43,18 +43,18 @@ def astar(agent_instance: AgentInstance,
     agent_class = agent_instance.agent_class
     width, height = agent_class.width, agent_class.height
 
-    # 快速连通性检查
+    #快速连通性检查
     if not passable_graph.is_connected(start, goal):
         return None
 
-    # 构建硬约束字典，方便快速查找
+    #构建硬约束字典，方便快速查找
     constraint_dict = {}
     for t, pos in constraints:
         if t not in constraint_dict:
             constraint_dict[t] = set()
         constraint_dict[t].add(pos)
 
-    # 辅助函数：获取智能体在某个左上角位置占据的所有栅格（这个在很多地方都用到了，直接整理到可通行图里面每次调用吧）
+    #辅助函数：获取智能体在某个左上角位置占据的所有栅格
     def get_occupied_cells(pos: Tuple[int, int]) -> List[Tuple[int, int]]:
         x, y = pos
         cells = []
@@ -63,14 +63,14 @@ def astar(agent_instance: AgentInstance,
                 cells.append((x + dx, y + dy))
         return cells
 
-    # 计算在特定时刻占据特定位置的单步惩罚（包括拥堵、桥、预约）
+    #计算在特定时刻占据特定位置的单步惩罚
     def step_penalty(pos: Tuple[int, int], t: int) -> float:
         # 检查硬约束
         if t in constraint_dict and pos in constraint_dict[t]:
-            return float('inf')  # 不可行状态
+            return float('inf')  #不可行状态
         cells = get_occupied_cells(pos)
 
-        # 分别累计三项惩罚并加权求和，限制总软约束惩罚小于1
+        #分别累计三项惩罚并加权求和，限制总软约束惩罚小于1
         sum_cr = 0.0
         sum_bridge = 0.0
         sum_res = 0.0
@@ -87,35 +87,33 @@ def astar(agent_instance: AgentInstance,
     
         return penalty
 
-    # 启发函数（曼哈顿距离）
+    #启发函数（曼哈顿距离）
     def heuristic(pos: Tuple[int, int]) -> int:
         return abs(pos[0] - goal[0]) + abs(pos[1] - goal[1])
 
-    # 优先队列元素：(f, g, t, pos)
-    # g 表示路径代价（移动次数），t 表示时间步
+    #优先队列元素：(f, g, t, pos)
+    #g表示路径代价（移动次数），t表示时间步
     open_set = []
-    # 初始状态
+    #初始状态
     t0 = 0
     penalty0 = step_penalty(start, t0)
     if penalty0 == float('inf'):  # 起点被硬约束禁止
         return None
-    g0 = penalty0  # 初始g值为penalty
+    g0 = penalty0  #初始g值为penalty
     f0 = g0 + heuristic(start)
     heapq.heappush(open_set, (f0, g0, t0, start))
 
-    # 状态: (pos, t) -> g_value
+    #状态: (pos, t) -> g_value
     g_score: Dict[Tuple[Tuple[int, int], int], float] = {(start, t0): g0}
-    # 记录父节点: (pos, t) -> ((parent_pos, parent_t), action_is_wait)
+    #记录父节点: (pos, t) -> ((parent_pos, parent_t), action_is_wait)
     came_from: Dict[Tuple[Tuple[int, int], int], Tuple[Tuple[Tuple[int, int], int], bool]] = {}
 
     while open_set:
         f, g, t, pos = heapq.heappop(open_set)
 
-        # 到达终点后，继续等待直到预约表中不再有冲突
+        #到达终点后，继续等待直到预约表中不再有冲突
         if pos == goal:
-            # 找到终点后，继续等待，直到到达终点的智能体不会与其他智能体冲突
-            # 但我们返回的是到达终点的路径，不包括无限等待
-            # 重建路径
+            #找到终点后，在原位等待直至所有智能体路径不冲突，返回路径时不包括到达终点后的等待状态
             path = []
             state = (pos, t)
             while state in came_from:
@@ -128,22 +126,22 @@ def astar(agent_instance: AgentInstance,
         if g > g_score.get((pos, t), float('inf')):
             continue
 
-        # 扩展邻居（四向移动）
+        #扩展邻居（四向移动）
         for nbr in passable_graph.get_neighbors(pos):
             nt = t + 1
             penalty = step_penalty(nbr, nt)
             if penalty == float('inf'):
                 continue
-            # 移动的代价是1（移动次数）+ penalty(惩罚）)
+            #移动的代价是1（移动次数）+ penalty(惩罚）)
             ng = g + 1 + penalty  
             state = (nbr, nt)
             if ng < g_score.get(state, float('inf')):
                 g_score[state] = ng
                 f_val = ng + heuristic(nbr)
                 heapq.heappush(open_set, (f_val, ng, nt, nbr))
-                came_from[state] = ((pos, t), False)  # False代表发生了移动
+                came_from[state] = ((pos, t), False)  #False代表发生了移动
 
-        # 扩展等待动作（使用可调的等待代价）
+        #扩展等待动作
         nt = t + 1
         penalty = step_penalty(pos, nt)
         if penalty != float('inf'):
@@ -208,7 +206,7 @@ def astar_classic(agent_instance, grid_map, constraints=None):
         if g > g_score.get((pos, t), float('inf')):
             continue
         nt = t + 1
-        # 移动
+        #移动
         for nbr in get_neighbors(pos):
             if nt in constraint_dict and nbr in constraint_dict[nt]:
                 continue
@@ -218,7 +216,7 @@ def astar_classic(agent_instance, grid_map, constraints=None):
                 g_score[state] = ng
                 heapq.heappush(open_set, (ng + heuristic(nbr), ng, nt, nbr))
                 came_from[state] = (pos, t)
-        # 等待
+        #等待
         if nt not in constraint_dict or pos not in constraint_dict[nt]:
             ng = g + 1
             state = (pos, nt)
